@@ -9,14 +9,6 @@ err = partial(click.secho, fg="red", err=True)
 
 
 @contextlib.contextmanager
-def as_cwd(path):
-    prev_cwd = os.getcwd()
-    os.chdir(path)
-    yield
-    os.chdir(prev_cwd)
-
-
-@contextlib.contextmanager
 def suppress_stdout():
     null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
     # Save the actual stdout (1) and stderr (2) file descriptors.
