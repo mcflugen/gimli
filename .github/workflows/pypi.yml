@@ -66,4 +66,4 @@ jobs:
       - name: Upload manylinux distributions
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
         run: |
-          twine upload --skip-existing dist/*gimli* --repository-url=https://test.pypi.org/legacy/
+          twine upload --skip-existing dist/*-manylinux*.whl --repository-url=https://test.pypi.org/legacy/
