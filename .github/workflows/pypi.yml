@@ -5,6 +5,7 @@ on: [push]
 env:
   TWINE_USERNAME: __token__
   TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+  TWINE_REPOSITORY_URL: 'https://test.pypi.org/legacy/'
 
 jobs:
   build-and-publish:
@@ -44,15 +45,11 @@ jobs:
 
       - name: Build macosx/win Python wheels
         if: matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
-        run: |
-          python setup.py bdist_wheel
-          twine upload --skip-existing dist/*gimli* --repository-url=https://test.pypi.org/legacy/
+        run: python setup.py bdist_wheel
 
       - name: Build source distribution
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
-        run: |
-          python setup.py sdist
-          twine upload --skip-existing dist/*gimli* --repository-url=https://test.pypi.org/legacy/
+        run: python setup.py sdist
 
       - name: Build manylinux Python wheels
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
@@ -63,7 +60,12 @@ jobs:
           system-packages: 'udunits2-devel'
           pre-build-command: 'export CFLAGS=-I/usr/include/udunits2'
 
-      - name: Upload manylinux distributions
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
-        run: |
-          twine upload --skip-existing dist/*-manylinux*.whl --repository-url=https://test.pypi.org/legacy/
+      - name: Upload distributions
+        run: >-
+          twine
+          upload
+          --skip-existing
+          dist/*-manylinux*.whl
+          dist/*-macosx*.whl
+          dist/*-win*.whl
+          dist/*.tar.gz || echo "nothing to upload"
