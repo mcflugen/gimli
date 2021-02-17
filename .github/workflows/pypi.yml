@@ -41,4 +41,4 @@ jobs:
         run: |
           pip install twine wheel cython
           python setup.py bdist_wheel
-          twine upload -u mcflugen -p${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
+          twine upload --skip-existing -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
