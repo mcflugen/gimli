@@ -15,7 +15,7 @@ __all__ = [
     "BadUnitError",
     "IncompatibleUnitsError",
     "Unit",
-    "UnitEndoding",
+    "UnitEncoding",
     "UnitFormatting",
     "UnitNameError",
     "UnitStatus",
