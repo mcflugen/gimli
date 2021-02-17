@@ -42,11 +42,13 @@ jobs:
         if: matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
         run: |
           python setup.py bdist_wheel
+          twine upload --skip-existing -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
 
       - name: Build source distribution
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
         run: |
           python setup.py sdist
+          twine upload --skip-existing -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
 
       - name: Build manylinux Python wheels
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
@@ -55,7 +57,5 @@ jobs:
           python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
           build-requirements: 'cython numpy'
           system-packages: 'udunits2-devel'
-
-      - name: Publish wheels to PyPI
         run: |
           twine upload --skip-existing -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
