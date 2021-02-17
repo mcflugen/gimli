@@ -49,7 +49,7 @@ jobs:
           conda list
 
       - name: Install build environment
-        run: pip install twine wheel cython
+        run: pip install twine wheel numpy cython
 
       - name: Build macosx/win Python wheels
         if: matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
