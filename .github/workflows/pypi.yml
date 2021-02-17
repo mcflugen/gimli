@@ -38,7 +38,7 @@ jobs:
           mamba list
 
       - name: Install pypa/build
-        run: pip install build
+        run: pip install build cython
 
       - name: Build a binary wheel and a source tarball
         run: python -m build --no-isolation --sdist --wheel --outdir dist/ .
