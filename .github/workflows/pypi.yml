@@ -73,4 +73,4 @@ jobs:
           pre-build-command: 'export CFLAGS=-I/usr/include/udunits2'
 
       - name: Upload distributions
-        run: twine upload --skip-existing dist/*-${{ matrix.platform }}*.whl
+        run: twine upload --skip-existing dist/(*-${{ matrix.platform }}*.whl|*.tar.gz)
