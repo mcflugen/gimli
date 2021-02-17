@@ -48,16 +48,15 @@ jobs:
           conda info
           conda list
 
-      - name: Install requirements
-        run: |
-          conda install mamba
-          mamba install --file=requirements.txt udunits2
-          pip install twine wheel cython
-          mamba list
+      - name: Install build environment
+        run: pip install twine wheel cython
 
       - name: Build macosx/win Python wheels
         if: matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
-        run: python setup.py bdist_wheel
+        run: |
+          conda install mamba
+          mamba install --file=requirements.txt udunits2
+          python setup.py bdist_wheel
 
       - name: Build source distribution
         if: matrix.os == 'ubuntu-latest'
