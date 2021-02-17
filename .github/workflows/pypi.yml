@@ -38,13 +38,7 @@ jobs:
           mamba list
 
       - name: Install pypa/build
-        run: pip install build cython
-
-      - name: Build a binary wheel and a source tarball
-        run: python -m build --no-isolation --sdist --wheel --outdir dist/ .
-
-      - name: Publish distribution to Test PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+        run: |
+          pip install twine wheel cython
+          python setup.py bdist_wheel
+          twine upload -u mcflugen -p${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
