@@ -22,11 +22,11 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
         include:
           - os: ubuntu-latest
-            wheels: '(*-manylinux*.whl|*.tar.gz)'
+            platform: manylinux
           - os: macos-latest
-            wheels: '*-macosx*.whl'
+            platform: macosx
           - os: windows-latest
-            wheels: '*-win*.whl'
+            platform: win
         exclude:
           - os: ubuntu-latest
             python-version: 3.7
@@ -73,8 +73,4 @@ jobs:
           pre-build-command: 'export CFLAGS=-I/usr/include/udunits2'
 
       - name: Upload distributions
-        run: >-
-          twine
-          upload
-          --skip-existing
-          dist/${{ matrix.wheels }}
+        run: twine upload --skip-existing dist/*-${{ matrix.platform }}*.whl
