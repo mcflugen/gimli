@@ -57,5 +57,8 @@ jobs:
           python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
           build-requirements: 'cython numpy'
           system-packages: 'udunits2-devel'
+
+      - name: Upload manylinux distributions
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
         run: |
           twine upload --skip-existing -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*gimli* --repository-url=https://test.pypi.org/legacy/
