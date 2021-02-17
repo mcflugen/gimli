@@ -210,8 +210,9 @@ def test_unit_converter_bad_from_units(system, to_, from_):
 
 
 def test_unit_converter_incompatible_units(system):
-    with pytest.raises(IncompatibleUnitsError):
+    with pytest.raises(IncompatibleUnitsError) as exc_info:
         system.Unit("s").to(system.Unit("m"))
+    assert "incompatible units" in str(exc_info.value)
 
 
 def test_unit_converter_inverse(system):

@@ -8,11 +8,10 @@ from ._udunits2 import (
     UnitStatus,
     UnitSystem,
 )
-from .errors import BadUnitError, IncompatibleUnitsError
+from .errors import IncompatibleUnitsError
 
 __version__ = pkg_resources.get_distribution("gimli").version
 __all__ = [
-    "BadUnitError",
     "IncompatibleUnitsError",
     "Unit",
     "UnitEncoding",

@@ -10,7 +10,7 @@ cimport numpy as np
 from libc.stdlib cimport free, malloc
 from libc.string cimport strcpy
 
-from .errors import BadUnitError, IncompatibleUnitsError
+from .errors import IncompatibleUnitsError
 from .utils import suppress_stdout
 
 DOUBLE = np.double
