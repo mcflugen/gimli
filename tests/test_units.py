@@ -4,8 +4,14 @@ import random
 import numpy as np
 import pytest
 
+from gimli import (
+    IncompatibleUnitsError,
+    UnitFormatting,
+    UnitNameError,
+    UnitStatus,
+    UnitSystem,
+)
 from gimli.units import transform_azimuth_to_math, transform_math_to_azimuth
-from gimli import UnitSystem, UnitNameError, UnitStatus, UnitFormatting, IncompatibleUnitsError
 
 
 @pytest.fixture
@@ -80,21 +86,46 @@ def test_system_unit_by_symbol(system):
 
 def test_unit_formatting(system):
     unit = system.Unit("0.1 lg(re m/(5 s)^2) @ 50")
-    assert unit.format(encoding="ascii", formatting=UnitFormatting.NAMES) == "0.1 lg(re 0.04 meter-second^-2) from 50"
-    assert unit.format(encoding="ascii", formatting=UnitFormatting.DEFINITIONS) == "0.1 lg(re 0.04 m.s-2) @ 50"
+    assert (
+        unit.format(encoding="ascii", formatting=UnitFormatting.NAMES)
+        == "0.1 lg(re 0.04 meter-second^-2) from 50"
+    )
+    assert (
+        unit.format(encoding="ascii", formatting=UnitFormatting.DEFINITIONS)
+        == "0.1 lg(re 0.04 m.s-2) @ 50"
+    )
 
-    assert unit.format(encoding="iso-8859-1", formatting=UnitFormatting.NAMES) == "0.1 lg(re 0.04 meter/second²) from 50"
-    assert unit.format(encoding="iso-8859-1", formatting=UnitFormatting.DEFINITIONS) == "0.1 lg(re 0.04 m/s²) @ 50"
+    assert (
+        unit.format(encoding="iso-8859-1", formatting=UnitFormatting.NAMES)
+        == "0.1 lg(re 0.04 meter/second²) from 50"
+    )
+    assert (
+        unit.format(encoding="iso-8859-1", formatting=UnitFormatting.DEFINITIONS)
+        == "0.1 lg(re 0.04 m/s²) @ 50"
+    )
 
-    assert unit.format(encoding="latin-1", formatting=UnitFormatting.NAMES) == "0.1 lg(re 0.04 meter/second²) from 50"
-    assert unit.format(encoding="latin-1", formatting=UnitFormatting.DEFINITIONS) == "0.1 lg(re 0.04 m/s²) @ 50"
+    assert (
+        unit.format(encoding="latin-1", formatting=UnitFormatting.NAMES)
+        == "0.1 lg(re 0.04 meter/second²) from 50"
+    )
+    assert (
+        unit.format(encoding="latin-1", formatting=UnitFormatting.DEFINITIONS)
+        == "0.1 lg(re 0.04 m/s²) @ 50"
+    )
 
-    assert unit.format(encoding="utf-8", formatting=UnitFormatting.NAMES) == "0.1 lg(re 0.04 meter·second⁻²) from 50"
-    assert unit.format(encoding="utf-8", formatting=UnitFormatting.DEFINITIONS) == "0.1 lg(re 0.04 m·s⁻²) @ 50"
+    assert (
+        unit.format(encoding="utf-8", formatting=UnitFormatting.NAMES)
+        == "0.1 lg(re 0.04 meter·second⁻²) from 50"
+    )
+    assert (
+        unit.format(encoding="utf-8", formatting=UnitFormatting.DEFINITIONS)
+        == "0.1 lg(re 0.04 m·s⁻²) @ 50"
+    )
 
 
 @pytest.mark.parametrize(
-    ("lhs", "cmp_", "rhs"), [
+    ("lhs", "cmp_", "rhs"),
+    [
         ("m", "lt", "km"),
         ("m", "le", "km"),
         ("m", "le", "m"),
@@ -103,7 +134,7 @@ def test_unit_formatting(system):
         ("km", "ge", "m"),
         ("km", "ge", "km"),
         ("km", "gt", "m"),
-    ]
+    ],
 )
 def test_unit_comparisons(system, lhs, cmp_, rhs):
     compare = getattr(system.Unit(lhs), f"__{cmp_}__")

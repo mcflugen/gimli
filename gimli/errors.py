@@ -7,7 +7,6 @@ class GimliError(Exception):
 
 
 class BadUnitError(GimliError):
-
     def __init__(self, unit):
         self._unit = unit
 
@@ -16,7 +15,6 @@ class BadUnitError(GimliError):
 
 
 class IncompatibleUnitsError(GimliError):
-
     def __init__(self, src, dst):
         self._src = src
         self._dst = dst

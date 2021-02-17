@@ -4,7 +4,6 @@ from functools import partial
 
 import click
 
-
 out = partial(click.secho, bold=True, err=True)
 err = partial(click.secho, fg="red", err=True)
 
@@ -34,4 +33,3 @@ def suppress_stdout():
     # Close the null files
     for fd in null_fds + save_fds:
         os.close(fd)
-
