@@ -2,7 +2,8 @@ name: PyPI
 
 on:
   push:
-    tags: ^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
+    tags:
+      - '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$'
 
 env:
   TWINE_USERNAME: __token__
