@@ -1,6 +1,8 @@
 name: PyPI
 
-on: [push]
+on:
+  push:
+    tags: ^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
 
 env:
   TWINE_USERNAME: __token__
@@ -23,6 +25,7 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: manylinux
+            python_versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
           - os: macos-latest
             platform: macosx
           - os: windows-latest
@@ -68,7 +71,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
         with:
-          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
+          python-versions: ${{ python_version }}
           build-requirements: 'cython numpy'
           system-packages: 'udunits2-devel'
           pre-build-command: 'export CFLAGS=-I/usr/include/udunits2'
