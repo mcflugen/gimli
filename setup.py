@@ -26,7 +26,7 @@ numpy_incl = pkg_resources.resource_filename("numpy", "core/include")
 
 setup(
     name="gimli",
-    version="0.1.0",
+    version="0.1.1",
     description="An object-oriented Python interface to udunits",
     long_description=long_description,
     author="Eric Hutton",
