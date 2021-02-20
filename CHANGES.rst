@@ -1,8 +1,8 @@
 Changelog for gimli
 ===================
 
-0.2.0 (unreleased)
-------------------
+0.2.0b0 (2021-02-20)
+--------------------
 
 - Added gimli command-line interface (#6)
 
