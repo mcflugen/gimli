@@ -562,20 +562,34 @@ cdef class UnitConverter:
         except TypeError:
             return self._convert_scalar(value)
         else:
-            values = np.asarray(value)
+            values = np.ascontiguousarray(value)
             if values.dtype not in (np.single, np.double):
                 values = np.asarray(value, dtype=DOUBLE)
+            
             if out is None:
                 out = np.empty_like(values)
+            elif out.dtype != values.dtype:
+                raise ValueError(
+                    f"out dtype does not match input dtype ({out.dtype != values.dtype})"
+                )
+
+            if not out.flags["C_CONTIGUOUS"]:
+                raise ValueError("out array is not C-contiguous")
+            
+            buffer = np.frombuffer(out.data, dtype=out.dtype)
+            values = np.frombuffer(values.data, dtype=values.dtype)
+            
+            buffer = out.reshape(-1)
+            values = values.reshape(-1)
 
             if out.dtype == np.double:
-                return self._convert_array(values, out)
+                rtn = self._convert_array(values, buffer)
             elif out.dtype == np.single:
-                print(out.dtype)
-                print(values.dtype)
-                return self._convert_float_array(values, out)
+                rtn = self._convert_float_array(values, buffer)
             else:
                 raise ValueError(f"unable to convert array of type {out.dtype}")
+
+            return out
 
     cdef _convert_scalar(self, value):
         return cv_convert_double(self._conv, value)
