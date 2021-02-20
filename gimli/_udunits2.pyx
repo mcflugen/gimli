@@ -568,6 +568,11 @@ cdef class UnitConverter:
             
             if out is None:
                 out = np.empty_like(values)
+            elif out.dtype != values.dtype:
+                raise ValueError(
+                    f"out dtype does not match input dtype ({out.dtype != values.dtype})"
+                )
+
             if not out.flags["C_CONTIGUOUS"]:
                 raise ValueError("out array is not C-contiguous")
             
@@ -576,7 +581,7 @@ cdef class UnitConverter:
             
             buffer = out.reshape(-1)
             values = values.reshape(-1)
-            
+
             if out.dtype == np.double:
                 rtn = self._convert_array(values, buffer)
             elif out.dtype == np.single:
