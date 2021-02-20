@@ -8,9 +8,6 @@ import numpy as np
 from ._udunits2 import IncompatibleUnitsError, UnitNameError, UnitSystem
 from .utils import err, out
 
-load = partial(np.loadtxt, delimiter=",")
-dump = partial(np.savetxt, sys.stdout, delimiter=", ", fmt="%f")
-
 
 @click.command()
 @click.version_option()
@@ -20,6 +17,9 @@ dump = partial(np.savetxt, sys.stdout, delimiter=", ", fmt="%f")
 @click.option("--data", default="")
 @click.pass_context
 def gimli(ctx, from_, to, data, filename):
+    load = partial(np.loadtxt, delimiter=",")
+    dump = partial(np.savetxt, sys.stdout, delimiter=", ", fmt="%f")
+
     if data:
         data = (StringIO(data),)
     else:
