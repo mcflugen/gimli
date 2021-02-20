@@ -4,7 +4,6 @@ from io import StringIO
 
 import click
 import numpy as np
-import pandas as pd
 
 from ._udunits2 import IncompatibleUnitsError, UnitNameError, UnitSystem
 from .utils import err, out
@@ -34,10 +33,10 @@ def gimli(ctx, from_, to, data, filename):
     try:
         src_to_dst = src_unit.to(dst_unit)
     except IncompatibleUnitsError:
-        err(f"incompatible units: {src}, {dst}")
+        err(f"incompatible units: {from_}, {to}")
         ctx.exit(-1)
 
-    out("Convering {src} -> {dst}".format(src=str(src_unit), dst=str(dst_unit)))
+    out(f"Convering {from_} -> {to}")
 
     for name in data + filename:
         array = load(name)
@@ -50,5 +49,5 @@ def get_unit_from_system(ctx, unit, system):
     try:
         return system.Unit(unit)
     except UnitNameError:
-        err(f"unknown or poorly-formed unit: {src}")
+        err(f"unknown or poorly-formed unit: {unit}")
         ctx.exit(-1)
