@@ -1,7 +1,9 @@
 import os
 import random
 
+import numpy as np
 import pytest
+from numpy.testing import assert_array_almost_equal
 
 from gimli import (
     IncompatibleUnitsError,
@@ -231,3 +233,87 @@ def test_unit_converter_inverse(system):
     seconds_to_hours = system.Unit("s").to(system.Unit("h"))
     hours_to_seconds = system.Unit("h").to(system.Unit("s"))
     assert hours_to_seconds(seconds_to_hours(val)) == pytest.approx(val)
+
+
+@pytest.mark.parametrize("dtype", (np.single, np.double))
+@pytest.mark.parametrize("shape", [(5,), (5, 1), (4, 5), (5, 6, 7)])
+def test_unit_converter_double_array(system, shape, dtype):
+    meters = system.Unit("m")
+    km = system.Unit("km")
+
+    m_to_km = meters.to(km)
+    values_in_m = np.ones(shape, dtype=dtype)
+    values_in_km = m_to_km(values_in_m)
+    assert_array_almost_equal(values_in_m, values_in_km * 1000.0)
+    assert values_in_km.dtype == dtype
+
+
+@pytest.mark.parametrize("dtype", (np.single, np.double))
+@pytest.mark.parametrize("shape", [(5,), (5, 1), (4, 5), (5, 6, 7)])
+def test_unit_converter_dtype_array_out_keyword(system, shape, dtype):
+    meters = system.Unit("m")
+    km = system.Unit("km")
+
+    m_to_km = meters.to(km)
+    values_in_m = np.ones(shape, dtype=dtype)
+    values_in_km = np.empty_like(values_in_m)
+
+    rtn = m_to_km(values_in_m, out=values_in_km)
+    assert_array_almost_equal(values_in_m, values_in_km * 1000.0)
+    assert rtn.dtype == dtype
+    assert rtn is values_in_km
+
+
+@pytest.mark.parametrize("dtype", ("int", "uint8", "bool"))
+def test_unit_converter_non_float_dtype(system, dtype):
+    meters = system.Unit("m")
+    dm = system.Unit("dm")
+
+    m_to_dm = meters.to(dm)
+    values_in_m = np.ones(10, dtype=dtype)
+
+    values_in_dm = m_to_dm(values_in_m)
+    assert values_in_dm.dtype == np.double
+    assert_array_almost_equal(values_in_m, values_in_dm / 10.0)
+
+    with pytest.raises(ValueError):
+        values_in_dm = np.empty(10, dtype=dtype)
+        m_to_dm(values_in_m, out=values_in_dm)
+
+
+@pytest.mark.parametrize(
+    "src_dtype,dst_dtype",
+    ((np.single, np.double), (np.double, np.single)),
+)
+def test_unit_converter_wrong_out_dtype(system, src_dtype, dst_dtype):
+    meters = system.Unit("m")
+    km = system.Unit("km")
+
+    m_to_km = meters.to(km)
+    values_in_m = np.ones(100, dtype=src_dtype)
+    values_in_km = np.empty_like(values_in_m, dst_dtype)
+    with pytest.raises(ValueError):
+        m_to_km(values_in_m, out=values_in_km)
+
+
+@pytest.mark.parametrize("dtype", (np.single, np.double))
+def test_unit_converter_in_place(system, dtype):
+    meters = system.Unit("m")
+    km = system.Unit("km")
+
+    m_to_km = meters.to(km)
+    values_in_m = np.ones((10, 5), dtype=dtype)
+    rtn = m_to_km(values_in_m, out=values_in_m)
+    assert rtn is values_in_m
+    assert_array_almost_equal(rtn, 1e-3)
+
+
+def test_unit_converter_non_contiguous(system):
+    meters = system.Unit("m")
+    km = system.Unit("km")
+
+    m_to_km = meters.to(km)
+    values_in_m = np.ones((10, 5), dtype=float)
+    values_in_km = np.empty_like(values_in_m).T
+    with pytest.raises(ValueError):
+        m_to_km(values_in_m, out=values_in_km)
