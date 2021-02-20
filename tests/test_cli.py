@@ -52,3 +52,26 @@ def test_opt_data(tmpdir):
 
         assert result.exit_code == 0, result.stderr
         assert_array_almost_equal(data, [1, 2, 3, 4, 5])
+
+
+def test_opt_to_from(tmpdir):
+    values = "1,2,3,4,5"
+    with tmpdir.as_cwd():
+        runner = CliRunner(mix_stderr=False)
+
+        result = runner.invoke(cli.gimli, ["--from=m", "--to=km", f"--data={values}"])
+        data = np.loadtxt(StringIO(result.stdout), delimiter=",")
+
+        assert result.exit_code == 0, result.stderr
+        assert_array_almost_equal(data * 1000.0, [1, 2, 3, 4, 5])
+
+
+def test_opt_to_from_incomaptible(tmpdir):
+    values = "1,2,3,4,5"
+    with tmpdir.as_cwd():
+        runner = CliRunner(mix_stderr=False)
+
+        result = runner.invoke(cli.gimli, ["--from=m", "--to=kg", f"--data={values}"])
+
+        assert result.exit_code != 0
+        assert result.stderr.startswith("incompatible units")
