@@ -242,7 +242,7 @@ cdef class _UnitSystem:
         cdef ut_unit* unit = ut_get_dimensionless_unit_one(self._unit_system)
         if unit == NULL:
             raise UnitError(ut_get_status())
-        return Unit.from_ptr(unit)
+        return Unit.from_ptr(unit, owner=False)
 
     def unit_by_name(self, name):
         """Get a unit from the system by name.
@@ -307,7 +307,11 @@ cdef class _UnitSystem:
         if unit == NULL:
             status = ut_get_status()
             raise UnitNameError(name, status)
-        return Unit.from_ptr(unit, owner=True)
+        if ut_is_dimensionless(unit):
+            return Unit.from_ptr(unit, owner=False)
+        else:
+            return Unit.from_ptr(unit, owner=True)
+
 
     @property
     def database(self):
@@ -503,7 +507,16 @@ cdef class Unit:
         bool
             ``True`` if the unit is dimensionless, otherwise ``False``.
         """
-        return ut_is_dimensionless(self._unit) != 0
+        rtn = ut_is_dimensionless(self._unit)
+        if rtn != 0:
+            return True
+        else:
+            status = ut_get_status()
+            if status == UnitStatus.SUCCESS:
+                return False
+            else:
+                raise UnitError(status)
+
 
     cpdef is_convertible_to(self, Unit unit):
         return bool(ut_are_convertible(self._unit, unit._unit))
