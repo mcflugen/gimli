@@ -66,6 +66,18 @@ def test_system_dimensionless(system):
     assert str(system.dimensionless_unit()) == "1"
 
 
+def test_dimensionless_not_freed_twice():
+    system = UnitSystem()
+    unit = system.dimensionless_unit()
+    del unit
+    del system
+
+    system = UnitSystem()
+    unit = system.Unit("1")
+    del unit
+    del system
+
+
 def test_system_unit_by_name(system):
     assert system.unit_by_name("meter") == system.Unit("m")
     assert system.unit_by_name("meters") == system.Unit("m")
