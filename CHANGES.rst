@@ -1,11 +1,14 @@
 Changelog for gimli
 ===================
 
-0.1.2 (unreleased)
+0.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added gimli command-line interface (#6)
 
+- Better handling of multi-dimensional and non-contiguous arrays (#5)
+
+- Fixed a issue that caused a segmentation fault when using dimensionless units (#4)
 
 0.1.1 (2021-02-17)
 ------------------
