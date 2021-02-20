@@ -1,7 +1,8 @@
 import pathlib
-import pkg_resources
 import sys
-from setuptools import setup, find_packages, Extension
+
+import pkg_resources
+from setuptools import Extension, find_packages, setup
 
 
 def read(filename):
@@ -50,7 +51,7 @@ setup(
     ],
     keywords=["units", "unit conversion", "earth science", "model coupling"],
     packages=find_packages(exclude=("tests*",)),
-    entry_points={"console_scripts": ["gimli=gimli.cli:main"]},
+    entry_points={"console_scripts": ["gimli=gimli.cli:gimli"]},
     ext_modules=[
         Extension(
             "gimli._udunits2",
