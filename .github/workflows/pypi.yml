@@ -3,7 +3,8 @@ name: PyPI
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - v*.*.*
+      - *[ab][0-9]*
 
 env:
   TWINE_USERNAME: __token__
