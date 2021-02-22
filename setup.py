@@ -26,7 +26,7 @@ if sys.platform.startswith("win"):
 numpy_incl = pkg_resources.resource_filename("numpy", "core/include")
 
 setup(
-    name="gimli",
+    name="gimli.units",
     version="0.2.0b1.dev0",
     description="An object-oriented Python interface to udunits",
     long_description=long_description,
