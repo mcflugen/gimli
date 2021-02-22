@@ -1,6 +1,12 @@
 Changelog for gimli
 ===================
 
+0.2.0b2 (unreleased)
+--------------------
+
+- Nothing changed yet.
+
+
 0.2.0b1 (2021-02-22)
 --------------------
 
