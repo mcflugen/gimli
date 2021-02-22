@@ -4,7 +4,9 @@ Changelog for gimli
 0.2.0b1 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Added release and prerelease actions to publish on PyPI and TestPyPI (#8)
+
+- Change name of package to gimli.units (#7)
 
 
 0.2.0b0 (2021-02-20)
