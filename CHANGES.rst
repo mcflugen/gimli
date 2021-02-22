@@ -1,7 +1,7 @@
 Changelog for gimli
 ===================
 
-0.2.0b1 (unreleased)
+0.2.0b1 (2021-02-22)
 --------------------
 
 - Added release and prerelease actions to publish on PyPI and TestPyPI (#8)
