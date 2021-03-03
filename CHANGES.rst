@@ -1,8 +1,8 @@
 Changelog for gimli
 ===================
 
-0.2.0b2 (unreleased)
---------------------
+0.2.1 (2021-03-02)
+------------------
 
 - Fixed a bug caused by passing a single value to the cli (#10)
 
