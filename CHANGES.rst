@@ -4,8 +4,9 @@ Changelog for gimli
 0.2.0b2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Fixed a bug caused by passing a single value to the cli (#10)
 
+- Added content to the README, mainly installation and usage instructions (#9)
 
 0.2.0b1 (2021-02-22)
 --------------------
