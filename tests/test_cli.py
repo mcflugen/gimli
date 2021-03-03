@@ -42,16 +42,19 @@ def test_from_file(tmpdir, shape):
         assert_array_almost_equal(np.squeeze(values), np.squeeze(data))
 
 
-def test_opt_data(tmpdir):
-    values = "1,2,3,4,5"
+@pytest.mark.parametrize(
+    "values", ["1,2,3,4,5", "2", "3.0", "1e-3", "0.1, 1e2", "-2.3"]
+)
+def test_opt_data(tmpdir, values):
     with tmpdir.as_cwd():
         runner = CliRunner(mix_stderr=False)
 
         result = runner.invoke(cli.gimli, [f"--data={values}"])
         data = np.loadtxt(StringIO(result.stdout), delimiter=",")
+        expected = np.loadtxt(StringIO(values), delimiter=",")
 
         assert result.exit_code == 0, result.stderr
-        assert_array_almost_equal(data, [1, 2, 3, 4, 5])
+        assert_array_almost_equal(data, expected)
 
 
 def test_opt_to_from(tmpdir):

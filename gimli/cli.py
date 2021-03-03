@@ -40,7 +40,7 @@ def gimli(ctx, from_, to, data, filename):
 
     for name in data + filename:
         array = load(name)
-        dump(src_to_dst(array, out=array))
+        dump(np.atleast_1d(src_to_dst(array, out=array)))
 
     ctx.exit(0)
 
