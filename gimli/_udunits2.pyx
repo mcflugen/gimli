@@ -343,7 +343,7 @@ cdef class _UnitSystem:
         free(self._filepath)
         self._unit_system = NULL
         self._filepath = NULL
-        self._status = UnitStatus.SUCCESS
+        self._status = 0
 
     def __str__(self):
         return str(self.database)
