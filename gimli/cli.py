@@ -10,7 +10,7 @@ from .utils import err, out
 
 
 @click.command()
-@click.version_option()
+@click.version_option(package_name="gimli.units")
 @click.argument("filename", type=click.File("rb"), nargs=-1)
 @click.option("-f", "--from", "from_", default="1", metavar="UNIT")
 @click.option("-t", "--to", default="1", metavar="UNIT")
