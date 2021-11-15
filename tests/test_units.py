@@ -5,12 +5,7 @@ import hypothesis.extra.numpy as hynp
 import numpy as np
 import pytest
 from hypothesis import given
-from hypothesis.strategies import floats
-from numpy.testing import (
-    assert_array_almost_equal,
-    assert_allclose,
-    assert_array_almost_equal_nulp,
-)
+from numpy.testing import assert_array_almost_equal, assert_allclose
 
 from gimli import (
     IncompatibleUnitsError,
