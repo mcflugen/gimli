@@ -1,9 +1,16 @@
 import os
 import random
 
+import hypothesis.extra.numpy as hynp
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal
+from hypothesis import given
+from hypothesis.strategies import floats
+from numpy.testing import (
+    assert_array_almost_equal,
+    assert_allclose,
+    assert_array_almost_equal_nulp,
+)
 
 from gimli import (
     IncompatibleUnitsError,
@@ -14,7 +21,7 @@ from gimli import (
 )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def system():
     os.environ.pop("UDUNITS2_XML_PATH", None)
     return UnitSystem()
@@ -248,52 +255,66 @@ def test_unit_converter_double_array(system, shape, dtype):
     assert values_in_km.dtype == dtype
 
 
-@pytest.mark.parametrize("dtype", (np.single, np.double))
-@pytest.mark.parametrize("shape", [(5,), (5, 1), (4, 5), (5, 6, 7)])
-def test_unit_converter_dtype_array_out_keyword(system, shape, dtype):
+@given(
+    src_values=hynp.arrays(
+        dtype=hynp.floating_dtypes(),
+        shape=hynp.array_shapes(),
+        elements={"allow_nan": True, "allow_infinity": True},
+    ),
+)
+def test_unit_converter_dtype_array_out_keyword(system, src_values):
     meters = system.Unit("m")
-    km = system.Unit("km")
+    dam = system.Unit("dam")
 
-    m_to_km = meters.to(km)
-    values_in_m = np.ones(shape, dtype=dtype)
-    values_in_km = np.empty_like(values_in_m)
+    m_to_dam = meters.to(dam)
+    values_in_dam = np.empty_like(src_values, dtype=src_values.dtype)
+    np.divide(src_values, 10.0, out=src_values)  # ensure that the dtype does not change
 
-    rtn = m_to_km(values_in_m, out=values_in_km)
-    assert_array_almost_equal(values_in_m, values_in_km * 1000.0)
-    assert rtn.dtype == dtype
-    assert rtn is values_in_km
+    rtn = m_to_dam(src_values, out=values_in_dam)
+    assert rtn.dtype == src_values.dtype
+    assert rtn.shape == src_values.shape
+    assert rtn is values_in_dam
+
+    assert_allclose(
+        src_values,
+        (values_in_dam * 10.0).astype(src_values.dtype),
+        equal_nan=True,
+        atol=np.finfo(src_values.dtype).resolution,
+    )
 
 
-@pytest.mark.parametrize("dtype", ("int", "uint8", "bool"))
-def test_unit_converter_non_float_dtype(system, dtype):
+@given(
+    values_in_m=hynp.arrays(
+        dtype=hynp.integer_dtypes(),
+        shape=hynp.array_shapes(),
+    ),
+)
+def test_unit_converter_from_integer(system, values_in_m):
     meters = system.Unit("m")
     dm = system.Unit("dm")
 
     m_to_dm = meters.to(dm)
-    values_in_m = np.ones(10, dtype=dtype)
 
     values_in_dm = m_to_dm(values_in_m)
     assert values_in_dm.dtype == np.double
-    assert_array_almost_equal(values_in_m, values_in_dm / 10.0)
-
-    with pytest.raises(ValueError):
-        values_in_dm = np.empty(10, dtype=dtype)
-        m_to_dm(values_in_m, out=values_in_dm)
+    assert_array_almost_equal(values_in_m * 10.0, values_in_dm)
 
 
-@pytest.mark.parametrize(
-    "src_dtype,dst_dtype",
-    ((np.single, np.double), (np.double, np.single)),
+@given(
+    values=hynp.arrays(
+        dtype=hynp.integer_dtypes(),
+        shape=hynp.array_shapes(),
+    ),
 )
-def test_unit_converter_wrong_out_dtype(system, src_dtype, dst_dtype):
+def test_unit_converter_to_integer(system, values):
     meters = system.Unit("m")
-    km = system.Unit("km")
+    dm = system.Unit("dm")
 
-    m_to_km = meters.to(km)
-    values_in_m = np.ones(100, dtype=src_dtype)
-    values_in_km = np.empty_like(values_in_m, dst_dtype)
-    with pytest.raises(ValueError):
-        m_to_km(values_in_m, out=values_in_km)
+    m_to_dm = meters.to(dm)
+    values_in_m = np.ones_like(values, dtype=float)
+
+    with pytest.raises(TypeError):
+        m_to_dm(values_in_m, out=values)
 
 
 @pytest.mark.parametrize("dtype", (np.single, np.double))
