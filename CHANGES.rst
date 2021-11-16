@@ -4,7 +4,11 @@ Changelog for gimli
 0.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added support for a wider range of array dtypes (#13)
+
+- Fixed AttributeError when deallocating UnitSystem after exiting Python (#12)
+
+- Fixed --version option for the gimli command (#11)
 
 
 0.2.1 (2021-03-02)
