@@ -19,33 +19,28 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]  # , windows-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: install mamba
-        uses: mamba-org/provision-with-micromamba@main
+      - uses: conda-incubator/setup-miniconda@v2
         with:
-          extra-specs: python="${{ matrix.python-version }}"
+          auto-update-conda: true
+          python-version: "${{ matrix.python-version }}"
+          channels: conda-forge
+          channel-priority: true
 
-      # - uses: conda-incubator/setup-miniconda@v2
-      #   with:
-      #     auto-update-conda: true
-      #     python-version: "${{ matrix.python-version }}"
-      #     channels: conda-forge
-      #     channel-priority: true
+      - name: Show conda installation info
+        run: |
+          conda info
+          conda list
 
-      # - name: Show conda installation info
-      #   run: |
-      #     micromamba info
-      #     micromamba list
-
-      # - name: Install requirements
-      #   run: |
-      #     mamba install --file=requirements.txt udunits2
-      #     mamba list
+      - name: Install requirements
+        run: |
+          conda install --file=requirements.txt udunits2
+          conda list
 
       - name: Build and install package
         run: |
@@ -62,3 +57,4 @@ jobs:
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
         uses: AndreMiras/coveralls-python-action@v20201129
+  
