@@ -1,7 +1,7 @@
 Changelog for gimli
 ===================
 
-0.2.2 (unreleased)
+0.3.0 (2021-11-16)
 ------------------
 
 - Added support for a wider range of array dtypes (#13)
