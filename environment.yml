@@ -1,0 +1,10 @@
+name: gimli
+channels:
+  - conda-forge
+dependencies:
+- click
+- numpy
+- udunits2
+- pip
+- pip:
+  - -r requirements-notebooks.txt
