@@ -525,8 +525,8 @@ cdef class Unit:
 
 cpdef as_floating_array(array):
     """Convert an array into a float array that can be passed to udunits functions."""
-    if not array.dtype in (np.single, np.float):
-        return array.astype(np.float)
+    if array.dtype not in (np.single, np.double):
+        return array.astype(np.double)
     return array
 
 
