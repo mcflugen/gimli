@@ -270,11 +270,13 @@ def test_unit_converter_dtype_array_out_keyword(system, src_values):
     assert rtn.shape == src_values.shape
     assert rtn is values_in_dam
 
+    desired = np.multiply(values_in_dam, 10.0, out=values_in_dam)
     assert_allclose(
         src_values,
-        (values_in_dam * 10.0).astype(src_values.dtype),
+        desired,
         equal_nan=True,
         atol=np.finfo(src_values.dtype).resolution,
+        rtol=np.finfo(src_values.dtype).resolution,
     )
 
 
