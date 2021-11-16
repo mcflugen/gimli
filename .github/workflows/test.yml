@@ -39,8 +39,9 @@ jobs:
 
       - name: Show conda installation info
         run: |
-          mamba info
-          mamba list
+          micromamba info
+          micromamba list
+          micromamba install mamba
 
       - name: Install requirements
         run: |
