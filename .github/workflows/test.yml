@@ -41,19 +41,18 @@ jobs:
         run: |
           micromamba info
           micromamba list
-          micromamba install mamba
 
-      - name: Install requirements
-        run: |
-          mamba install --file=requirements.txt udunits2
-          mamba list
+      # - name: Install requirements
+      #   run: |
+      #     mamba install --file=requirements.txt udunits2
+      #     mamba list
 
       - name: Build and install package
         run: |
           pip install -e .
 
       - name: Install testing dependencies
-        run: mamba install --file=requirements-testing.txt
+        run: pip install -r requirements-testing.txt
 
       - name: Test
         run: |
