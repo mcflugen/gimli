@@ -522,6 +522,25 @@ cdef class Unit:
         return bool(ut_are_convertible(self._unit, unit._unit))
 
 
+
+cpdef as_floating_array(array):
+    """Convert an array into a float array that can be passed to udunits functions."""
+    if array.dtype not in (np.single, np.double):
+        return array.astype(np.double)
+    return array
+
+
+cpdef as_floating_array_like(prototype, out=None):
+    """Create a floating array that is like another array with regards to its dtype."""
+    if out is None:
+        out = np.empty_like(prototype)
+
+    if np.can_cast(prototype.dtype, out.dtype):
+        return as_floating_array(out)
+    else:
+        raise TypeError(f"unable to cast from {prototype.dtype} to {out.dtype}")
+
+
 cdef class UnitConverter:
 
     """Convert numeric values between compatible units."""
@@ -539,7 +558,7 @@ cdef class UnitConverter:
     def __cinit__(self):
         self.ptr_owner = False
 
-    def __call__(self, value, out=None):
+    def __call__(self, values, out=None):
         """Convert a value from one unit to another.
 
         Parameters
@@ -558,36 +577,31 @@ cdef class UnitConverter:
             The converted values or values.
         """
         try:
-            n_items = len(value)
+            n_items = len(values)
         except TypeError:
-            return self._convert_scalar(value)
+            return self._convert_scalar(values)
         else:
-            values = np.ascontiguousarray(value)
-            if values.dtype not in (np.single, np.double):
-                values = np.asarray(value, dtype=DOUBLE)
-            
-            if out is None:
-                out = np.empty_like(values)
-            elif out.dtype != values.dtype:
-                raise ValueError(
-                    f"out dtype does not match input dtype ({out.dtype != values.dtype})"
-                )
+            values_save, out_save = values, out
+            values = as_floating_array(np.ascontiguousarray(values))
+
+            out = as_floating_array_like(values_save, out=out)
 
             if not out.flags["C_CONTIGUOUS"]:
                 raise ValueError("out array is not C-contiguous")
-            
-            buffer = np.frombuffer(out.data, dtype=out.dtype)
-            values = np.frombuffer(values.data, dtype=values.dtype)
-            
-            buffer = out.reshape(-1)
-            values = values.reshape(-1)
+
+            buffer = np.frombuffer(out.data, dtype=out.dtype).reshape(-1)
+            values = np.frombuffer(values.data, dtype=values.dtype).reshape(-1)
 
             if out.dtype == np.double:
                 rtn = self._convert_array(values, buffer)
             elif out.dtype == np.single:
                 rtn = self._convert_float_array(values, buffer)
             else:
-                raise ValueError(f"unable to convert array of type {out.dtype}")
+                raise ValueError(f"udunits does not support {out.dtype}")
+
+            if out_save is not None and out is not out_save:
+                out_save.flat = rtn.flat
+                out = out_save
 
             return out
 
