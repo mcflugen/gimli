@@ -28,7 +28,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.9"
           channels: conda-forge
           channel-priority: true
 
@@ -40,6 +40,8 @@ jobs:
       - name: Install requirements
         run: |
           conda install mamba
+          mamba create -n testing python=${{ matrix.python-version }}
+          conda activate testing
           mamba install --file=requirements.txt udunits2
           mamba list
 
