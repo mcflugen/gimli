@@ -68,7 +68,7 @@ From Source
 ~~~~~~~~~~~
 
 After downloading the *gimli* source code, run the following from
-*gimli*'s top-level folder (the one that contains *setup.py*) to install
+*gimli*'s top-level folder (the one that contains *pyproject.toml*) to install
 *gimli* into the current environment:
 
 ::
