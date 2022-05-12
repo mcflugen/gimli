@@ -55,18 +55,18 @@ jobs:
           conda list
 
       - name: Install build environment
-        run: pip install twine wheel numpy cython
+        run: pip install build twine
 
       - name: Build macosx/win Python wheels
         if: matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
         run: |
-          conda install --file=requirements.txt udunits2
-          python setup.py bdist_wheel
+          conda install udunits2
+          python -m build --wheel
 
       - name: Build source distribution
         if: matrix.os == 'ubuntu-latest'
         run: |
-          python setup.py sdist
+          python -m build --sdist
           twine upload --skip-existing dist/*.tar.gz
 
       - name: Build manylinux Python wheels
