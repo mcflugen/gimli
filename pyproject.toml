@@ -1,22 +1,76 @@
-[build-system]
-requires = ["cython", "numpy", "setuptools", "wheel"]
+[project]
+name = "gimli.units"
+requires-python = ">=3.10"
+description = "An object-oriented Python interface to udunits"
+keywords = [
+    "earth science",
+    "model coupling",
+    "unit conversion",
+    "units",
+]
+authors = [
+    { email = "eric.hutton@colorado.edu" },
+    { name = "Eric Hutton" },
+]
+maintainers = [
+    { email = "eric.hutton@colorado.edu" },
+    { name = "Eric Hutton" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "click",
+    "numpy",
+]
+dynamic = [
+    "readme",
+    "version",
+]
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-testpaths = ["gimli", "tests"]
-norecursedirs = [".*", "*.egg*", "build", "dist"]
-addopts = """
-  --ignore setup.py
-  --tb native
-  --strict
-  --durations 16
-  --doctest-modules
-  -vvv
-"""
-doctest_optionflags = [
-  "NORMALIZE_WHITESPACE",
-  "IGNORE_EXCEPTION_DETAIL",
-  "ALLOW_UNICODE"
+[project.license]
+text = "MIT"
+
+[project.optional-dependencies]
+dev = [
+    "nox",
+]
+
+[project.urls]
+Changelog = "https://github.com/csdms/gimli/blob/master/CHANGES.rst"
+Documentation = "https://gimli.readthedocs.io/"
+Homepage = "https://github.com/csdms/gimli"
+Repository = "https://github.com/csdms/gimli"
+
+[project.scripts]
+gimli = "gimli.cli:gimli"
+
+[build-system]
+requires = [
+    "cython",
+    "numpy",
+    "setuptools",
+    "wheel",
+]
+
+[tool.setuptools.dynamic.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[tool.setuptools.dynamic.version]
+attr = "gimli._version.__version__"
+
+[tool.setuptools.packages.find]
+where = [
+    "src",
 ]
 
 [tool.isort]
@@ -25,3 +79,33 @@ include_trailing_comma = true
 force_grid_wrap = 0
 combine_as_imports = true
 line_length = 88
+
+[tool.pytest.ini_options]
+minversion = "6.0.0rc1"
+testpaths = [
+    "tests",
+]
+norecursedirs = [
+    ".*",
+    "*.egg*",
+    "build",
+    "dist",
+]
+addopts = [
+    "--ignore=bmi_tester/bootstrap",
+    "--ignore=bmi_tester/tests",
+    "--tb=native",
+    "--strict-markers",
+    "--durations=16",
+    "--doctest-modules",
+    "-vvv",
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+    "ALLOW_UNICODE",
+]
+
+[tool.zest-releaser]
+tag-format = "v{version}"
+python-file-with-version = "src/gimli/_version.py"
