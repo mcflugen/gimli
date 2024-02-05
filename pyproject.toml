@@ -42,6 +42,11 @@ text = "MIT"
 dev = [
     "nox",
 ]
+testing = [
+	"hypothesis",
+	"pytest",
+	"pytest-cov",
+]
 
 [project.urls]
 Changelog = "https://github.com/csdms/gimli/blob/master/CHANGES.rst"
