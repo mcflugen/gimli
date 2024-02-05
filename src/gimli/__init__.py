@@ -1,17 +1,16 @@
-import pkg_resources
-
-from ._udunits2 import Unit
-from ._udunits2 import UnitEncoding
-from ._udunits2 import UnitFormatting
-from ._udunits2 import UnitNameError
-from ._udunits2 import UnitStatus
-from ._udunits2 import UnitSystem
-from .errors import IncompatibleUnitsError
+from gimli._udunits2 import Unit
+from gimli._udunits2 import UnitEncoding
+from gimli._udunits2 import UnitFormatting
+from gimli._udunits2 import UnitNameError
+from gimli._udunits2 import UnitStatus
+from gimli._udunits2 import UnitSystem
+from gimli._version import __version__
+from gimli.errors import IncompatibleUnitsError
 
 units = UnitSystem()
 
-__version__ = pkg_resources.get_distribution("gimli.units").version
 __all__ = [
+    "__version__",
     "units",
     "IncompatibleUnitsError",
     "Unit",
@@ -21,5 +20,3 @@ __all__ = [
     "UnitStatus",
     "UnitSystem",
 ]
-
-del pkg_resources

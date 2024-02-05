@@ -3,7 +3,6 @@ import os
 import sys
 from functools import partial
 
-
 out = partial(print, file=sys.stderr)
 err = partial(print, file=sys.stderr)
 

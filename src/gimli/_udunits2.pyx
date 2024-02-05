@@ -12,8 +12,8 @@ from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.string cimport strcpy
 
-from .errors import IncompatibleUnitsError
-from .utils import suppress_stdout
+from gimli.errors import IncompatibleUnitsError
+from gimli.utils import suppress_stdout
 
 DOUBLE = np.double
 FLOAT = np.float32
