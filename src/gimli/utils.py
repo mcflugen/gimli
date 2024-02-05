@@ -1,11 +1,11 @@
 import contextlib
 import os
+import sys
 from functools import partial
 
-import click
 
-out = partial(click.secho, bold=True, err=True)
-err = partial(click.secho, fg="red", err=True)
+out = partial(print, file=sys.stderr)
+err = partial(print, file=sys.stderr)
 
 
 @contextlib.contextmanager

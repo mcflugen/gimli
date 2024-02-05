@@ -28,7 +28,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-    "click",
     "numpy",
 ]
 dynamic = [
@@ -51,7 +50,7 @@ Homepage = "https://github.com/csdms/gimli"
 Repository = "https://github.com/csdms/gimli"
 
 [project.scripts]
-gimli = "gimli.cli:gimli"
+gimli = "gimli.main:main"
 
 [build-system]
 requires = [
