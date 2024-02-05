@@ -62,8 +62,8 @@ requires = [
 ]
 
 [tool.setuptools.dynamic.readme]
-file = "README.rst"
-content-type = "text/x-rst"
+file = "README.md"
+content-type = "text/markdown"
 
 [tool.setuptools.dynamic.version]
 attr = "gimli._version.__version__"
