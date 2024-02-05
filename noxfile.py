@@ -14,8 +14,8 @@ PYTHON_VERSION = "3.12"
 @nox.session(python=PYTHON_VERSION, venv_backend="conda")
 def test(session: nox.Session) -> None:
     """Run the tests."""
-    session.install(".[testing]")
     session.conda_install("udunits2", channel=["nodefaults", "conda-forge"])
+    session.install(".[testing]")
 
     args = ["--cov", PROJECT, "-vvv"] + session.posargs
 
