@@ -1,5 +1,6 @@
 *.egg-info/
 *.py[cod]
+*.so
 .coverage
 .nox/
 __pycache__/
