@@ -2,7 +2,6 @@
 
 
 class GimliError(Exception):
-
     pass
 
 
@@ -12,4 +11,4 @@ class IncompatibleUnitsError(GimliError):
         self._dst = dst
 
     def __str__(self):
-        return "incompatible units ({0!r}, {1!r})".format(self._src, self._dst)
+        return f"incompatible units ({self._src!r}, {self._dst!r})"

@@ -1,13 +1,15 @@
 # cython: language_level=3
 import os
 import pathlib
-from enum import Enum, Flag
+from enum import Enum
+from enum import Flag
 
 import numpy as np
 import pkg_resources
 
 cimport numpy as np
-from libc.stdlib cimport free, malloc
+from libc.stdlib cimport free
+from libc.stdlib cimport malloc
 from libc.string cimport strcpy
 
 from .errors import IncompatibleUnitsError

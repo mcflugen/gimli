@@ -1,22 +1,27 @@
-import pathlib
+import os
 import sys
 
-from setuptools import Extension, find_packages, setup
+import numpy
+from setuptools import Extension
+from setuptools import setup
 
-
-udunits2_prefix = pathlib.Path(sys.prefix)
 if sys.platform.startswith("win"):
-    udunits2_prefix = udunits2_prefix / "Library"
+    udunits2_prefix = os.path.join(sys.prefix, "Library")
+else:
+    udunits2_prefix = sys.prefix
 
 setup(
     include_package_data=True,
     ext_modules=[
         Extension(
             "gimli._udunits2",
-            ["gimli/_udunits2.pyx"],
+            ["src/gimli/_udunits2.pyx"],
             libraries=["udunits2"],
-            include_dirs=[str(udunits2_prefix / "include"), numpy.get_include()],
-            library_dirs=[str(udunits2_prefix / "lib")],
+            include_dirs=[
+                os.path.join(udunits2_prefix, "include"),
+                numpy.get_include(),
+            ],
+            library_dirs=[os.path.join(udunits2_prefix, "lib")],
         )
     ],
 )

@@ -188,7 +188,7 @@ Units accepted for use with the SI
             <def>cGy</def>
             <aliases> <name><singular>rad</singular></name> </aliases>
         </unit>
-        --> 
+        -->
         <!-- 'rem' is changed from 'cSv' since 'Sv' has been reassigned to sverdrup for CF
 	-->
         <unit>

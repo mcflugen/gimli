@@ -57,4 +57,3 @@ jobs:
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
         uses: AndreMiras/coveralls-python-action@v20201129
-  

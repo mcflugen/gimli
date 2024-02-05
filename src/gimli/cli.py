@@ -5,8 +5,11 @@ from io import StringIO
 import click
 import numpy as np
 
-from ._udunits2 import IncompatibleUnitsError, UnitNameError, UnitSystem
-from .utils import err, out
+from ._udunits2 import IncompatibleUnitsError
+from ._udunits2 import UnitNameError
+from ._udunits2 import UnitSystem
+from .utils import err
+from .utils import out
 
 
 @click.command()
