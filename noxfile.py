@@ -50,8 +50,8 @@ def build_docs(session: nox.Session) -> None:
     build_generated_docs(session)
 
     session.install(
-        *("-r", "requirements-docs.txt"),
-        *("-r", "requirements.txt"),
+        *("-r", "requirements-docs.in"),
+        *("-r", "requirements.in"),
     )
     session.install(".")
 
