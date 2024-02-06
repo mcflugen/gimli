@@ -20,10 +20,9 @@ An object-oriented Python interface to [udunits2][udunits-link] built with cytho
 
 ## Requirements
 
-*gimli.units* requires Python 3 and *udunits2*.
+*gimli.units* requires *udunits2*.
 
-Apart from Python, *gimli* has a number of other requirements, the main
-one being *udunits2*. *udunits2* is the unit conversion C library that
+*udunits2* is the unit conversion C library that
 *gimli* wraps using *cython*. The easiest way to install *udunits2* is
 through Anaconda (see the Install section), or *yum* (as *udunits2-devel*
 on ubuntu-based Linux). It can, however, also be compiled and installed from source.
@@ -32,12 +31,7 @@ You can get the source code either as a [.tar.gz][udunits-download] or from
 
 All other requirements are available using either *pip* or *conda*. To
 see a full listing of the requirements, have a look at the project's
-*requirements.txt* file.
-
-If you are a developer of *gimli* you will also want to install
-additional dependencies for running *gimli*'s tests to make sure that
-things are working as they should. These dependencies are listed in
-*requirements-testing.txt*.
+*requirements.in* file.
 
 ## Installation
 
@@ -134,15 +128,13 @@ From the command line you can use *gimli* to convert values from one
 unit to another.
 
 ```bash
-gimli --from=miles --to=ft --data=1.0
+gimli --from=miles --to=ft
 ```
 ```
 5280.000000
 ```
 
-Values to convert are passed through the *--data* option as a
-comma-separated list of numbers. You can also provide values through
-files and use a dash for *stdin*.
+Values to convert can be passed through the files (use a dash for *stdin*).
 
 ```bash
 echo "1.0" | gimli --from=cal --to=joule -
