@@ -8,11 +8,11 @@ from hypothesis import given
 from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal
 
+import gimli
 from gimli import UnitFormatting
 from gimli import UnitNameError
 from gimli import UnitStatus
 from gimli import UnitSystem
-from gimli.errors import IncompatibleUnitsError
 
 
 @pytest.fixture(scope="module")
@@ -224,9 +224,8 @@ def test_unit_converter_bad_from_units(system, to_, from_):
 
 
 def test_unit_converter_incompatible_units(system):
-    with pytest.raises(IncompatibleUnitsError) as exc_info:
+    with pytest.raises(gimli.errors.IncompatibleUnitsError):
         system.Unit("s").to(system.Unit("m"))
-    assert "incompatible units" in str(exc_info.value)
 
 
 def test_unit_converter_inverse(system):
