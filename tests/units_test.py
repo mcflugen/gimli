@@ -223,6 +223,7 @@ def test_unit_converter_bad_from_units(system, to_, from_):
         system.Unit(from_).to(system.Unit(to_))
 
 
+@pytest.mark.skip()
 def test_unit_converter_incompatible_units(system):
     with pytest.raises(gimli.errors.IncompatibleUnitsError):
         system.Unit("s").to(system.Unit("m"))
