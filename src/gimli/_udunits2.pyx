@@ -1,6 +1,7 @@
 # cython: language_level=3
 import os
 import pathlib
+import sys
 from enum import Enum
 from enum import Flag
 
@@ -14,6 +15,11 @@ from libc.string cimport strcpy
 
 from gimli.errors import IncompatibleUnitsError
 from gimli.utils import suppress_stdout
+
+if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
+    import importlib.resources as importlib_resources
+else:  # pragma: no cover (<PY312)
+    import importlib_resources
 
 DOUBLE = np.double
 FLOAT = np.float32
@@ -223,9 +229,12 @@ cdef class _UnitSystem:
             try:
                 filepath = os.environ["UDUNITS2_XML_PATH"]
             except KeyError:
-                filepath = pkg_resources.resource_filename(
-                    "gimli", "data/udunits/udunits2.xml"
+                filepath = str(
+                    importlib_resources.files("gimli") / "data/udunits/udunits2.xml"
                 )
+                # filepath = pkg_resources.resource_filename(
+                #     "gimli", "data/udunits/udunits2.xml"
+                # )
                 status = UnitStatus.OPEN_DEFAULT
             else:
                 status = UnitStatus.OPEN_ENV

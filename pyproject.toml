@@ -28,6 +28,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
+    "importlib-resources; python_version < '3.12'",
     "numpy",
 ]
 dynamic = [
