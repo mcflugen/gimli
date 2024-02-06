@@ -81,13 +81,15 @@ jobs:
           python -m pip install cibuildwheel==2.11.4
           python -m cibuildwheel --only ${{ matrix.cibw-only }} --print-build-identifiers
 
+      - name: Install udunits
+        run: sudo apt-get install -y udunits2-devel
+
       - name: Build wheels
+        env:
+          CFLAGS: '-I/usr/include/udunits2'
         uses: pypa/cibuildwheel@v2.16.2
         with:
           only: ${{ matrix.cibw-only }}
-          build-requirements: 'cython numpy'
-          system-packages: 'udunits2-devel'
-          pre-build-command: 'export CFLAGS=-I/usr/include/udunits2'
 
       - uses: actions/upload-artifact@v3
         with:
