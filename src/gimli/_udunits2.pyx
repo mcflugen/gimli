@@ -1,4 +1,6 @@
 # cython: language_level=3
+from __future__ import annotations
+
 import os
 import pathlib
 import sys
@@ -30,22 +32,22 @@ ctypedef np.float_t FLOAT_t
 
 class UnitError(Exception):
 
-    def __init__(self, code, msg=""):
+    def __init__(self, code: int, msg: str =""):
         self._code = code
         self._msg = msg
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = self._msg or STATUS_MESSAGE.get(self._code, "Unknown")
         return "{0} (status {1})".format(msg, self._code)
 
 
 class UnitNameError(UnitError):
 
-    def __init__(self, name, code):
+    def __init__(self, name: str, code: int):
         self._name = name
         self._code = code
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{0!r}: {1} (status {2})".format(
             self._name, STATUS_MESSAGE.get(self._code, "Unknown"), self._code
         )
@@ -176,10 +178,10 @@ class UnitSystem(_UnitSystem):
         Path to a *udunits2* xml-formatted unit database. If not provided,
         a default system of units is used.
     """
-    def __init__(self, filepath=None):
+    def __init__(self, filepath: str | None=None):
         self._registry = dict()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Unit:
         try:
             return self._registry[key]
         except KeyError:

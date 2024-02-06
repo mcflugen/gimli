@@ -1,6 +1,7 @@
 import contextlib
 import os
 import sys
+from collections.abc import Generator
 from functools import partial
 
 out = partial(print, file=sys.stderr)
@@ -8,7 +9,7 @@ err = partial(print, file=sys.stderr)
 
 
 @contextlib.contextmanager
-def suppress_stdout():
+def suppress_stdout() -> Generator[None, None, None]:
     null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
     # Save the actual stdout (1) and stderr (2) file descriptors.
     save_fds = [os.dup(1), os.dup(2)]
