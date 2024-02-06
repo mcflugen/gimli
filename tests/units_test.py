@@ -8,11 +8,11 @@ from hypothesis import given
 from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal
 
-from gimli import IncompatibleUnitsError
 from gimli import UnitFormatting
 from gimli import UnitNameError
 from gimli import UnitStatus
 from gimli import UnitSystem
+from gimli.errors import IncompatibleUnitsError
 
 
 @pytest.fixture(scope="module")
