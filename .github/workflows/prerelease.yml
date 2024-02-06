@@ -82,9 +82,7 @@ jobs:
           python -m cibuildwheel --only ${{ matrix.cibw-only }} --print-build-identifiers
 
       - name: Install udunits
-        run: |
-          sudo apt-add-repository universe
-          sudo apt-get install libudunits2-dev
+        run: sudo apt-get install libudunits2-dev
 
 
       - name: Build wheels
