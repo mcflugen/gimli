@@ -56,7 +56,7 @@ Homepage = "https://github.com/csdms/gimli"
 Repository = "https://github.com/csdms/gimli"
 
 [project.scripts]
-gimli = "gimli.main:main"
+gimli = "gimli._main:main"
 
 [build-system]
 requires = [

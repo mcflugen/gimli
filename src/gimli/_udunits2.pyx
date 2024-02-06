@@ -16,7 +16,7 @@ from libc.stdlib cimport malloc
 from libc.string cimport strcpy
 
 from gimli.errors import IncompatibleUnitsError
-from gimli.utils import suppress_stdout
+from gimli._utils import suppress_stdout
 
 if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
     import importlib.resources as importlib_resources

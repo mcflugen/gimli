@@ -10,8 +10,8 @@ from gimli._udunits2 import IncompatibleUnitsError
 from gimli._udunits2 import UnitNameError
 from gimli._udunits2 import UnitSystem
 from gimli._version import __version__
-from gimli.utils import err
-from gimli.utils import out
+from gimli._utils import err
+from gimli._utils import out
 
 system = UnitSystem()
 load_values = partial(np.loadtxt, delimiter=",")
