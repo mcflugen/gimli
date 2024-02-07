@@ -89,7 +89,13 @@ where = [
 ]
 
 [tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-*"
+skip = "*-musllinux_*"
+archs = "x86_64,aarch64,arm64,AMD64,x86"
+
+[tool.cibuildwheel.linux]
 before-all = [
+	"yum install -y flex libtool",
 	"cd src/gimli/data/udunits-2",
 	"mkdir m4",
 	"autoreconf -fvi",
@@ -97,9 +103,6 @@ before-all = [
 	"make",
 	"make install",
 ]
-build = "cp310-* cp311-* cp312-*"
-skip = "*-musllinux_*"
-archs = "x86_64,aarch64,arm64,AMD64,x86"
 
 [tool.isort]
 multi_line_output = 3
