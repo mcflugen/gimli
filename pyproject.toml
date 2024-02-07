@@ -81,6 +81,10 @@ gimli = [
     "data/udunits/*.xml*",
     "data/udunits/*.h",
     "data/udunits-2/**/*",
+    "data/bin/*",
+    "data/include/*",
+    "data/lib/*",
+    "data/share/**/*",
 ]
 
 [tool.setuptools.packages.find]
