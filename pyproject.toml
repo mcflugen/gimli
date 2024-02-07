@@ -104,6 +104,17 @@ before-all = [
 	"make install",
 ]
 
+[tool.cibuildwheel.macos]
+before-all = [
+	"brew install flex libtool texinfo",
+	"cd src/gimli/data/udunits-2",
+	"mkdir m4",
+	"autoreconf -fvi",
+	"./configure",
+	"make",
+	"make install",
+]
+
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
