@@ -86,6 +86,12 @@ where = [
     "src",
 ]
 
+[tool.cibuildwheel]
+before-all = "apt-get install libudunits2-dev"
+build = "cp310-* cp311-* cp312-*"
+skip = "*-musllinux_*"
+archs = "x86_64,aarch64,arm64,AMD64,x86"
+
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
