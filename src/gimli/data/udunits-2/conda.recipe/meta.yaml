@@ -1,0 +1,26 @@
+package:
+  name: udunits2
+  version: {{ GIT_DESCRIBE_TAG|replace("v","") }}
+
+source:
+  path: ../
+
+build:
+  detect_binary_files_with_prefix: true
+  features:
+    - vc14  # [win and py>=36]
+
+requirements:
+  build:
+    - python  # [win]
+    - cmake  # [win]
+    - expat
+    - vc 14  # [win and py>=36]
+  run:
+    - expat
+    - vc 14  # [win and py>=36]
+
+test:
+  commands:
+    - udunits2 -h
+    - udunits2 -H meter -W miles
