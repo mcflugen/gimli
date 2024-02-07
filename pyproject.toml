@@ -80,6 +80,7 @@ attr = "gimli._version.__version__"
 gimli = [
     "data/udunits/*.xml*",
     "data/udunits/*.h",
+    "data/udunits-2/**/*",
 ]
 
 [tool.setuptools.packages.find]
@@ -88,6 +89,14 @@ where = [
 ]
 
 [tool.cibuildwheel]
+before-all = [
+	"cd src/gimli/data/udunits-2",
+	"mkdir m4",
+	"autoreconf -fvi",
+	"./configure",
+	"make",
+	"make install",
+]
 build = "cp310-* cp311-* cp312-*"
 skip = "*-musllinux_*"
 archs = "x86_64,aarch64,arm64,AMD64,x86"
