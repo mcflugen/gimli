@@ -87,7 +87,7 @@ where = [
 ]
 
 [tool.cibuildwheel]
-before-all = "apt-get install libudunits2-dev"
+before-all = "yum install -y udunits2-devel"
 build = "cp310-* cp311-* cp312-*"
 skip = "*-musllinux_*"
 archs = "x86_64,aarch64,arm64,AMD64,x86"
