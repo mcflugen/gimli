@@ -95,7 +95,7 @@ archs = "x86_64,aarch64,arm64,AMD64,x86"
 
 [tool.cibuildwheel.linux]
 before-all = [
-	"yum install -y flex libtool",
+	"yum install -y flex libtool texinfo",
 	"cd src/gimli/data/udunits-2",
 	"mkdir m4",
 	"autoreconf -fvi",
