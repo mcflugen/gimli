@@ -92,7 +92,7 @@ where = [
 build = "cp310-* cp311-* cp312-*"
 skip = "*-musllinux_*"
 archs = "x86_64,aarch64,arm64,AMD64,x86"
-environment = "WITH_UDUNITS2={project}/src/gimli/data/udunits-2"
+environment = "WITH_UDUNITS2=/project/src/gimli/data/udunits-2"
 
 [tool.cibuildwheel.linux]
 before-all = [
