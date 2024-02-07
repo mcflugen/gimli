@@ -116,7 +116,7 @@ STATUS_MESSAGE = {
 }
 
 
-cdef extern from "udunits2.h":
+cdef extern from "data/udunits/udunits2.h":
     ctypedef struct ut_system:
         pass
     ctypedef struct ut_unit:

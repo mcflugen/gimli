@@ -79,6 +79,7 @@ attr = "gimli._version.__version__"
 [tool.setuptools.package-data]
 gimli = [
     "data/udunits/*.xml*",
+    "data/udunits/*.h",
 ]
 
 [tool.setuptools.packages.find]
@@ -87,7 +88,6 @@ where = [
 ]
 
 [tool.cibuildwheel]
-before-all = "yum install -y udunits2-devel"
 build = "cp310-* cp311-* cp312-*"
 skip = "*-musllinux_*"
 archs = "x86_64,aarch64,arm64,AMD64,x86"
