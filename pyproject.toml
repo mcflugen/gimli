@@ -106,7 +106,7 @@ before-all = [
 
 [tool.cibuildwheel.macos]
 before-all = [
-	"brew install flex libtool texinfo",
+	"brew install automake libtool texinfo",
 	"cd src/gimli/data/udunits-2",
 	"mkdir m4",
 	"autoreconf -fvi",
