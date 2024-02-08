@@ -23,8 +23,11 @@ setup(
             "gimli._udunits2",
             ["src/gimli/_udunits2.pyx"],
             libraries=["udunits2"],
-            include_dirs=[udunits2_incdir, numpy.get_include()],
-            library_dirs=[udunits2_libdir],
+            include_dirs=[numpy.get_include()],
+            # include_dirs=[udunits2_incdir, numpy.get_include()],
+            library_dirs=[
+                os.path.join(os.path.dirname(__file__), "src", "gimli"), udunits2_libdir
+            ],
         )
     ],
 )
