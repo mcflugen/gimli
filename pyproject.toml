@@ -109,6 +109,11 @@ before-all = [
     "make",
     "make install",
 ]
+repair-wheel-command = [
+    "unzip {wheel}",
+    "ls -al gimli",
+    "auditwheel repair . -w {dest_dir} {wheel}",
+]
 
 [tool.cibuildwheel.macos]
 before-all = [
