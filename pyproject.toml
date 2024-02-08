@@ -84,7 +84,7 @@ gimli = [
     "data/bin/*",
     "data/include/*",
     "data/lib/*",
-    "data/share/**/*",
+    # "data/share/**/*",
 ]
 
 [tool.setuptools.packages.find]
@@ -102,9 +102,9 @@ environment = "WITH_UDUNITS2=/project/src/gimli/data"
 before-all = [
 	"yum install -y flex libtool texinfo",
 	"cd src/gimli/data/udunits-2",
-	"mkdir m4",
+	"mkdir -p m4",
 	"autoreconf -fvi",
-	"./configure",
+	"./configure --disable-static --enable-shared",
 	"make",
 	"make install",
 ]
@@ -113,9 +113,9 @@ before-all = [
 before-all = [
 	"brew install automake libtool texinfo",
 	"cd src/gimli/data/udunits-2",
-	"mkdir m4",
+	"mkdir -p m4",
 	"autoreconf -fvi",
-	"./configure",
+	"./configure --disable-static --enable-shared",
 	"make",
 	"make install",
 ]
