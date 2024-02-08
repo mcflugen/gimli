@@ -8,7 +8,6 @@ from enum import Enum
 from enum import Flag
 
 import numpy as np
-import pkg_resources
 
 cimport numpy as np
 from libc.stdlib cimport free
