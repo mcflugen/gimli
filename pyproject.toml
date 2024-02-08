@@ -105,7 +105,8 @@ before-all = [
     "cd src/gimli/data/udunits-2",
     "mkdir -p m4",
     "autoreconf -fvi",
-    "./configure --disable-static --enable-shared --libdir={package}/src/gimli --includedir={package}/src/gimli",
+    # "./configure --disable-static --enable-shared --libdir={package}/src/gimli --includedir={package}/src/gimli",
+    "./configure --disable-static --enable-shared --prefix=/usr/local",
     "make",
     "make install",
 ]
