@@ -81,9 +81,6 @@ gimli = [
     "data/udunits/*.xml*",
     "data/udunits/*.h",
     "data/udunits-2/**/*",
-    "data/bin/*",
-    "data/include/*",
-    "data/lib/*",
     "libudunits2*",
     "*.h",
 ]
