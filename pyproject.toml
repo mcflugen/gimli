@@ -127,6 +127,16 @@ before-all = [
     "make install",
 ]
 
+[tool.cibuildwheel.windows]
+before-all = [
+    "pip install cmake"
+    "cmake -G 'NMake Makefiles' src/gimli/data/udunits-2",
+    "nmake libudunits2",
+]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
+
+
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
