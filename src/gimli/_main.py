@@ -1,7 +1,6 @@
 import argparse
 import sys
 from collections.abc import Sequence
-from functools import partial
 from typing import Any
 
 import numpy as np
