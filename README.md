@@ -3,12 +3,13 @@
 [build-badge]: https://github.com/mcflugen/gimli/actions/workflows/test.yml/badge.svg
 [build-link]: https://github.com/mcflugen/gimli/actions/workflows/test.yml
 [expat-github]: https://github.com/libexpat/libexpat
+[expat-license]: https://github.com/libexpat/libexpat?tab=MIT-1-ov-file#readme
 [pypi-badge]: https://badge.fury.io/py/gimli.units.svg
 [pypi-link]: https://badge.fury.io/py/gimli.units
 [udunits-download]: https://artifacts.unidata.ucar.edu/service/rest/repository/browse/downloads-udunits/
 [udunits-github]: https://github.com/Unidata/UDUNITS-2
+[udunits-license]: https://github.com/Unidata/UDUNITS-2/tree/master?tab=License-1-ov-file
 [udunits-link]: https://www.unidata.ucar.edu/software/udunits/
-
 
 ![[Build Status][build-link]][build-badge]
 ![[PyPI][pypi-link]][pypi-badge]
@@ -166,7 +167,7 @@ gimli --from=knot --to=m/s values.txt
 
 `gimli.units` includes two third-party libraries, `expat` and `udunits`,
 which are "vendored" as part of our codebase. This means that these
-libraries are embedded directly within our package, rather than being
+libraries are embedded directly within `gimli.units`, rather than being
 external dependencies.
 
 ### Reasons for Vendoring
@@ -174,6 +175,7 @@ external dependencies.
 - **`expat`**: An XML parser library written in C, vendored to ensure
   consistent and reliable XML parsing across various platforms and
   environments without requiring separate installation of the library.
+  `expat` is a dependency of `udunits`.
 - **`udunits`**: A library for units of physical quantities, vendored
   to provide robust unit conversion and management, ensuring compatibility
   and consistency in unit operations.
@@ -190,8 +192,9 @@ external dependencies.
   tested to work seamlessly with our package.
 
 ### Licensing
-- **`expat` License**: [License Information for expat](#)
-- **`udunits` License**: [License Information for udunits](#)
+
+- **`expat` License**: [License Information for expat][expat-license]
+- **`udunits` License**: [License Information for udunits][udunits-license]
 - Our use of these vendored libraries complies with their respective
   licenses. Users of our package are also subject to these terms.
 
