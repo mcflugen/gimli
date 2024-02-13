@@ -55,12 +55,12 @@ jobs:
             os: "windows-latest"
 
           # Windows 32
-          - cibw-only: "cp310-win32"
-            os: "windows-latest"
-          - cibw-only: "cp311-win32"
-            os: "windows-latest"
-          - cibw-only: "cp312-win32"
-            os: "windows-latest"
+          # - cibw-only: "cp310-win32"
+          #   os: "windows-latest"
+          # - cibw-only: "cp311-win32"
+          #   os: "windows-latest"
+          # - cibw-only: "cp312-win32"
+          #   os: "windows-latest"
 
     steps:
       - uses: actions/checkout@v4
@@ -78,16 +78,16 @@ jobs:
 
       - name: Print build identifiers
         run: |
-          python -m pip install cibuildwheel==2.11.4
+          python -m pip install cibuildwheel
           python -m cibuildwheel --only ${{ matrix.cibw-only }} --print-build-identifiers
 
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2.0
+
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.16.5
         with:
           only: ${{ matrix.cibw-only }}
-          build-requirements: 'cython numpy'
-          system-packages: 'udunits2-devel'
-          pre-build-command: 'export CFLAGS=-I/usr/include/udunits2'
 
       - uses: actions/upload-artifact@v3
         with:
@@ -126,6 +126,8 @@ jobs:
     needs: ["build-wheels", "build-sdist"]
     name: "Publish to TestPyPI"
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
 
     steps:
       - uses: actions/download-artifact@v3
