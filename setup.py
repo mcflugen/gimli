@@ -5,10 +5,10 @@ import numpy
 from setuptools import Extension
 from setuptools import setup
 
-if sys.platform.startswith("win"):
+udunits2_prefix = os.environ.get("WITH_UDUNITS2", sys.prefix)
+if sys.platform.startswith("win") and "WITH_UDUNITS" not in os.environ:
     udunits2_prefix = os.path.join(sys.prefix, "Library")
-else:
-    udunits2_prefix = sys.prefix
+vendored_prefix = os.path.join(os.path.dirname(__file__), "_inst")
 
 setup(
     include_package_data=True,
@@ -18,10 +18,14 @@ setup(
             ["src/gimli/_udunits2.pyx"],
             libraries=["udunits2"],
             include_dirs=[
-                os.path.join(udunits2_prefix, "include"),
                 numpy.get_include(),
+                os.path.join(udunits2_prefix, "include"),
+                os.path.join(vendored_prefix, "include"),
             ],
-            library_dirs=[os.path.join(udunits2_prefix, "lib")],
+            library_dirs=[
+                os.path.join(udunits2_prefix, "lib"),
+                os.path.join(vendored_prefix, "lib"),
+            ],
         )
     ],
 )
