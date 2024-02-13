@@ -178,6 +178,36 @@ def publish_pypi(session):
         "build/wheelhouse/*.tar.gz",
     )
 
+@nox.session(name="list-ci-matrix")
+def list_ci_matrix(session):
+    def _os_from_wheel(name):
+        if "linux" in name:
+            return "ubuntu-latest"
+        elif "macos" in name:
+            return "macos-latest"
+        elif "win" in name:
+            return "windows-latest"
+
+    for wheel in _get_wheels(session):
+        print(f"- cibw-only: {wheel!r}".replace("'", '"'))
+        print(f"  os: {_os_from_wheel(wheel)!r}".replace("'", '"'))
+
+
+def _get_wheels(session):
+    platforms = session.posargs or ["linux", "macos", "windows"]
+    session.install("cibuildwheel")
+
+    wheels = []
+    for platform in platforms:
+        wheels += session.run(
+            "cibuildwheel",
+            "--print-build-identifiers",
+            "--platform",
+            platform,
+            silent=True,
+        ).splitlines()
+    return wheels
+
 
 @nox.session(python=False)
 def clean(session):
