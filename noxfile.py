@@ -50,8 +50,8 @@ def build_docs(session: nox.Session) -> None:
     build_generated_docs(session)
 
     session.install(
-        *("-r", "requirements-docs.txt"),
-        *("-r", "requirements.txt"),
+        *("-r", "requirements-docs.in"),
+        *("-r", "requirements.in"),
     )
     session.install(".")
 
@@ -138,7 +138,7 @@ def clean(session):
             shutil.rmtree(".pytest_cache", ignore_errors=True)
             shutil.rmtree(".venv", ignore_errors=True)
 
-            for pattern in ["*.py[co]", "__pycache__"]:
+            for pattern in ["*.py[co]", "__pycache__", "*.so"]:
                 _clean_rglob(pattern)
 
 
