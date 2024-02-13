@@ -8,15 +8,14 @@ from enum import Enum
 from enum import Flag
 
 import numpy as np
-import pkg_resources
 
 cimport numpy as np
 from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.string cimport strcpy
 
+from gimli._utils import suppress_stdout
 from gimli.errors import IncompatibleUnitsError
-from gimli.utils import suppress_stdout
 
 if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
     import importlib.resources as importlib_resources
