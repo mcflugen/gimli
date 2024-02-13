@@ -43,6 +43,67 @@ def build(session: nox.Session) -> None:
     session.run("python", "-m", "build", "--outdir", "./build/wheelhouse")
 
 
+@nox.session(name="build-extern", python=None)
+def build_extern(session: nox.Session) -> None:
+    build_dir = str(ROOT / "build/extern")
+    inst_dir = str(ROOT / "dist/extern")
+    src_dir = str(ROOT / "extern/udunits-2.2.28")
+
+    os.makedirs(inst_dir, exist_ok=True)
+
+    os.makedirs(os.path.join(build_dir, "expat"), exist_ok=True)
+    with session.chdir(os.path.join(build_dir, "expat")):
+        session.run(
+            "cmake",
+            *("-S", str(ROOT / "extern/expat-2.6.0/")),
+            *("-D", f"CMAKE_INSTALL_PREFIX={inst_dir}"),
+            external=True,
+        )
+        session.run(
+            "cmake",
+            *("--build", "."),
+            *("--config", "Release"),
+            external=True,
+        )
+        session.run(
+            "cmake",
+            *("--build", "."),
+            *("--config", "Release"),
+            *("--target", "install"),
+            external=True,
+        )
+
+    os.makedirs(os.path.join(build_dir, "udunits"), exist_ok=True)
+    with session.chdir(os.path.join(build_dir, "udunits")):
+        session.run(
+            "cmake",
+            *("-S", src_dir),
+            *("-D", f"CMAKE_INSTALL_PREFIX={inst_dir}"),
+            *("-D", f"EXPAT_LIBRARY={inst_dir}/lib/libexpat.dylib"),
+            env={
+                "LD_LIBRARY_PATH": f"{inst_dir}/lib",
+                "DYLD_LIBRARY_PATH": f"{inst_dir}/lib",
+                "LDFLAGS": f"-L{inst_dir}/lib",
+                "CFLAGS": f"-I{inst_dir}/include",
+            },
+            external=True,
+        )
+        session.run(
+            "cmake",
+            *("--build", "."),
+            *("--config", "Release"),
+            *("--target", "libudunits2"),
+            external=True,
+        )
+        session.run(
+            "cmake",
+            *("--build", "."),
+            *("--config", "Release"),
+            *("--target", "install"),
+            external=True,
+        )
+
+
 @nox.session(name="build-docs")
 def build_docs(session: nox.Session) -> None:
     """Build the docs."""
