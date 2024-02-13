@@ -185,6 +185,7 @@ def clean(session):
     folders = (
         (ROOT,) if not session.posargs else (pathlib.Path(f) for f in session.posargs)
     )
+
     for folder in folders:
         if not str(folder.resolve()).startswith(str(ROOT.resolve())):
             session.log(f"skipping {folder}: folder is outside of repository")
@@ -199,8 +200,10 @@ def clean(session):
             shutil.rmtree(".pytest_cache", ignore_errors=True)
             shutil.rmtree(".venv", ignore_errors=True)
 
-            for pattern in ["*.py[co]", "__pycache__", "*.so"]:
-                _clean_rglob(pattern)
+            for d in ("src", "tests"):
+                with session.chdir(d):
+                    for pattern in ["*.py[co]", "__pycache__", "*.c", "*.so"]:
+                        _clean_rglob(pattern)
 
 
 def _clean_rglob(pattern):
