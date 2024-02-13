@@ -44,9 +44,9 @@ dev = [
     "nox",
 ]
 testing = [
-	"hypothesis",
-	"pytest",
-	"pytest-cov",
+    "hypothesis",
+    "pytest",
+    "pytest-cov",
 ]
 
 [project.urls]
@@ -56,7 +56,7 @@ Homepage = "https://github.com/csdms/gimli"
 Repository = "https://github.com/csdms/gimli"
 
 [project.scripts]
-gimli = "gimli.main:main"
+gimli = "gimli._main:main"
 
 [build-system]
 requires = [
@@ -66,6 +66,9 @@ requires = [
     "wheel",
 ]
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.dynamic.readme]
 file = "README.md"
 content-type = "text/markdown"
@@ -73,16 +76,57 @@ content-type = "text/markdown"
 [tool.setuptools.dynamic.version]
 attr = "gimli._version.__version__"
 
-[tool.setuptools]
-include-package-data = true
-
 [tool.setuptools.package-data]
-gimli = ["data/udunits/*.xml*"]
+gimli = [
+    "data/udunits/*.xml*",
+]
 
 [tool.setuptools.packages.find]
 where = [
     "src",
 ]
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-*"
+skip = "*-musllinux_*"
+archs = "x86_64,aarch64,arm64,AMD64,x86"
+before-build = [
+    "cd extern/udunits-2.2.28",
+    "mkdir -p m4",
+    "autoreconf -fvi",
+    "./configure --disable-static --enable-shared --prefix=/usr/local",
+    "make",
+    "make install",
+]
+test-requires = [
+    "hypothesis",
+    "pytest",
+]
+test-command = "pytest {package}/tests"
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y flex libtool texinfo"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install automake libtool texinfo"
+
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+before-all = [
+    "cd {package}\\extern\\expat-2.6.0",
+    "cmake -S . -DCMAKE_INSTALL_PREFIX={package}\\_inst",
+    "cmake --build . --config Release",
+    "cmake --build . --config Release --target install",
+    "set LIB=%LIBRARY_LIB%;{package}\\_inst\\lib;%LIB%",
+    "set LIBPATH=%LIBRARY_LIB%;{package}\\_inst\\lib;%LIBPATH%",
+    "set INCLUDE={package}\\_inst\\include;%INCLUDE%",
+    "cd {package}\\extern\\udunits-2.2.28",
+    "set CFLAGS=\"-I{package}\\_inst\\include\"",
+    "cmake -S . -DCMAKE_INSTALL_PREFIX={package}\\_inst -D EXPAT_INCLUDE_DIR={package}\\_inst\\include\\expat.h",
+    "cmake --build . --config Release --target libudunits2",
+    "cmake --build . --config Release --target install",
+]
+repair-wheel-command = "delvewheel repair --add-path=_inst\\bin -w {dest_dir} {wheel}"
 
 [tool.isort]
 multi_line_output = 3
@@ -90,6 +134,14 @@ include_trailing_comma = true
 force_grid_wrap = 0
 combine_as_imports = true
 line_length = 88
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 minversion = "6.0.0rc1"
