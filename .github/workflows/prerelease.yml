@@ -30,6 +30,22 @@ jobs:
           - cibw-only: "cp312-manylinux_aarch64"
             os: "ubuntu-latest"
 
+          # musllinux x86_64
+          - cibw-only: "cp310-musllinux_x86_64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp311-musllinux_x86_64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp312-musllinux_x86_64"
+            os: "ubuntu-latest"
+
+          # musllinux aarch64
+          - cibw-only: "cp310-musllinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp311-musllinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp312-musllinux_aarch64"
+            os: "ubuntu-latest"
+
           # Mac x86_64
           - cibw-only: "cp310-macosx_x86_64"
             os: "macos-latest"

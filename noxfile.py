@@ -178,6 +178,7 @@ def publish_pypi(session):
         "build/wheelhouse/*.tar.gz",
     )
 
+
 @nox.session(name="list-ci-matrix")
 def list_ci_matrix(session):
     def _os_from_wheel(name):
