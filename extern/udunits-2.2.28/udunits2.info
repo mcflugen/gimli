@@ -1,0 +1,358 @@
+This is udunits2.info, produced by makeinfo version 5.1 from
+udunits2.texi.
+
+Copyright 2014 University Corporation for Atmospheric Research and
+contributors.  All rights reserved.
+
+   This software was developed by the Unidata Program Center of the
+University Corporation for Atmospheric Research (UCAR)
+<http://www.unidata.ucar.edu>.
+
+   Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   1) Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.  2)
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.  3)
+Neither the names of the development group, the copyright holders, nor
+the names of contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+4) This license shall terminate automatically and you may no longer
+exercise any of the rights granted to you by this license as of the date
+you commence an action, including a cross-claim or counterclaim, against
+the copyright holders or any contributor alleging that this software
+infringes a patent.  This termination provision shall not apply for an
+action alleging patent infringement by combinations of this software
+with other software or hardware.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+INFO-DIR-SECTION Science
+START-INFO-DIR-ENTRY
+* udunits-2: (udunits2).  The Unidata package for units of physical quantities.
+END-INFO-DIR-ENTRY
+
+
+File: udunits2.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
+
+UDUNITS-2
+*********
+
+This manual describes the UDUNITS-2 package, which contains a C library
+for units of physical quantities and a unit-definition and
+value-conversion utility.
+
+   Copyright 2014 University Corporation for Atmospheric Research and
+contributors.  All rights reserved.
+
+   This software was developed by the Unidata Program Center of the
+University Corporation for Atmospheric Research (UCAR)
+<http://www.unidata.ucar.edu>.
+
+   Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   1) Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.  2)
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.  3)
+Neither the names of the development group, the copyright holders, nor
+the names of contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+4) This license shall terminate automatically and you may no longer
+exercise any of the rights granted to you by this license as of the date
+you commence an action, including a cross-claim or counterclaim, against
+the copyright holders or any contributor alleging that this software
+infringes a patent.  This termination provision shall not apply for an
+action alleging patent infringement by combinations of this software
+with other software or hardware.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+
+* Menu:
+
+* Introduction::        Introduction
+* Differences::		    How this package differs from the UDUNITS-1 package
+* Installation::        Installing this package
+* Library::             The unit library
+* Utility::             The unit utility
+* Database::            The unit database
+* Support::             Support for this package
+* Complete Index::      Complete index
+
+
+File: udunits2.info,  Node: Introduction,  Next: Differences,  Prev: Top,  Up: Top
+
+1 Introduction
+**************
+
+The UDUNITS-2 package provides support for units of physical quantities.
+Its three main components are: 1) *note a C library: (udunits2lib)Top.
+for units of physical quantities; 2) *note a utility:
+(udunits2prog)Top.; for obtaining the definition of a unit and for
+converting numeric values between compatible units; and 3) an *note
+extensive database of units: Database.
+
+
+File: udunits2.info,  Node: Differences,  Next: Installation,  Prev: Introduction,  Up: Top
+
+2 How This Package Differs from the Original 'UDUNITS' Package
+**************************************************************
+
+The 'UDUNIT-2' package differs from the 'UDUNITS-1' package in the
+following ways:
+
+   * *Support for non-ASCII characters:* The 'UDUNITS-1' package only
+     supports the ASCII character set.  The 'UDUNITS-2' package supports
+     the following character sets: ASCII, ISO 8859-1 (Latin-1), and the
+     UTF-8 encoding of ISO 10646 (Unicode).  This means that unit string
+     specifications like "'µ°F·Ω⁻¹'" are now supported (your
+     viewer must support UTF-8 to display this string correctly).
+
+   * *Support for logarithmic units:* The unit string specification
+     "'0.1 lg(re 1 mW)'" specifies a deciBel unit with a one milliwatt
+     reference level.  Such units are fully integrated into the package
+     and all meaningful operations and conversions are supported.
+
+   * *Persistent value converters:* It is now possible to obtain a
+     _converter_ data-object, which can be used to convert numeric
+     values in one unit to numeric values in another, compatible unit.
+     The values can be 'float', 'double', or one-dimensional arrays of
+     'float's or 'double's.
+
+   * *Improved API:* Due to the above changes, it was not possible to
+     keep the application programming interface (API) of the 'UDUNITS-1'
+     package.  The new interface, however, is easily understood and easy
+     to use.  To support backward comptibility, the package does contain
+     a version 1 C API, which uses the version 2 library.
+
+   * *XML unit database:* The unit database is encoded using
+     human-readable XML rather than a custom format.  The XML parser
+     included in the package supports an _<import>_ element to allow
+     easy and convenient customization.
+
+   * *No Fortran or Perl API:* Interfaces for these languages have not
+     yet been created.  Contact <support-udunits@unidata.ucar.edu> if
+     you are interested in helping to create these interfaces.
+
+   One thing that has not changed is that almost all unit string
+specifications understood by the 'UDUNITS-1' package are also understood
+by the 'UDUNITS-2' package.  One exception is the symbol 'g', which in
+version 1 of the package was associated with standard free fall (a unit
+of acceleration) but which is associated with the unit gram in version 2
+of the package.
+
+
+File: udunits2.info,  Node: Installation,  Next: Library,  Prev: Differences,  Up: Top
+
+3 Installing this Package
+*************************
+
+* Menu:
+
+* Prerequisites::       Prerequisites for this package
+* Binary::              Installing from a binary distribution
+* Source::              Installing from a source distribution
+
+
+File: udunits2.info,  Node: Prerequisites,  Next: Binary,  Up: Installation
+
+3.1 Prerequisites for This Package
+==================================
+
+The Expat library and header-files must be installed.  Look for the
+library "libexpat" and the header-file "expat.h".
+
+   If this package is to be tested (which is optional), then the CUnit
+library and header-files must be installed.  Look for the library
+"libcunit" and the header-files "CUnit/CUnit.h" and "CUnit/Basic.h".
+
+   If this package is to be built on a Windows system, then the CMake
+and MinGW packages must be installed.  Look for the utility "cmake" and
+the directory/folder "MinGW".
+
+
+File: udunits2.info,  Node: Binary,  Next: Source,  Prev: Prerequisites,  Up: Installation
+
+3.2 Installing from a Binary Distribution
+=========================================
+
+Currently, only an RPM binary distribution is supported.
+
+   Download the distribution by browsing to the Unidata UDUNITS RPM
+repository at
+<https://artifacts.unidata.ucar.edu/service/rest/repository/browse/rpm-udunits/udunits/>
+or by executing, for example, the following commands:
+     cd ~/Downloads
+     wget https://artifacts.unidata.ucar.edu/repository/rpm-udunits/udunits/udunits-2.2.28-x86_64.rpm
+
+   Install the distribution.  For example,
+     sudo rpm --install [--prefix=/opt/udunits] ~/Downloads/udunits-2.2.28-x86_64.rpm
+   where the argument in square brackets is optional.  The default
+installation directory is '/usr/local'.
+
+
+File: udunits2.info,  Node: Source,  Prev: Binary,  Up: Installation
+
+3.3 Installing from a Source Distribution
+=========================================
+
+* Menu:
+
+* Unix::     Building and installing in Unix-like environments
+* Windows::  Building and installing in Windows environments
+
+
+File: udunits2.info,  Node: Unix,  Next: Windows,  Up: Source
+
+3.3.1 Installing from source on Unix
+------------------------------------
+
+Download the source by browsing to the Unidata UDUNITS source repository
+at
+<https://artifacts.unidata.ucar.edu/service/rest/repository/browse/downloads-udunits/>
+or by executing, for example, the following commands:
+     cd ~/Downloads
+     curl -O https://artifacts.unidata.ucar.edu/repository/downloads-udunits/udunits-2.2.28.tar.gz
+
+   Unpack the distribution in an appropriate place.  For example,
+     cd /opt
+     sudo pax -rz < ~/Downloads/udunits-2.2.28.tar.gz
+
+   Build and install the package.  For example
+     cd udunits2-2.2.28
+     ./configure [--prefix=INSTALL_PREFIX] >&configure.log
+     make all [check] install [install-html] [install-pdf]
+   where the arguments in square brackets are optional.  The default
+installation prefix is the parent directory of the source directory.
+
+
+File: udunits2.info,  Node: Windows,  Prev: Unix,  Up: Source
+
+3.3.2 Installing from source on Windows
+---------------------------------------
+
+Download the source by browsing to the Unidata UDUNITS source repository
+at
+<https://artifacts.unidata.ucar.edu/service/rest/repository/browse/downloads-udunits/>
+or by executing, for example, the following commands:
+     cd C:\Users\CURRENT_USER\Downloads
+     curl -O https://artifacts.unidata.ucar.edu/repository/downloads-udunits/udunits-2.2.28.zip
+
+   Unpack the distribution by opening the downloaded file and extracting
+the contents to, for example, the user's "Downloads" folder.  Note that,
+by default, the extractor might create an extra top-level folder with a
+duplicate name.  Remove the extra folder from the destination path if
+this is the case - either before or after extraction.
+
+   Build and install the package using cmake(1).  For example
+     cd C:\Users\CURRENT_USER\Downloads\udunits2-2.2.28
+     mkdir build
+     cd build
+     cmake [-D CMAKE_INSTALL_PREFIX=INSTALL_PREFIX] ..
+     make all install
+   where the argument in square brackets is optional.  The default
+installation folder is the parent folder of the source folder.
+
+
+File: udunits2.info,  Node: Library,  Next: Utility,  Prev: Installation,  Up: Top
+
+4 Unit Library
+**************
+
+*Note (udunits2lib)UDUNITS Library::, for details on this package's unit
+library.
+
+
+File: udunits2.info,  Node: Utility,  Next: Database,  Prev: Library,  Up: Top
+
+5 Unit Utility
+**************
+
+*Note (udunits2prog)UDUNITS Utility::, for details on this package's
+unit utility.
+
+
+File: udunits2.info,  Node: Database,  Next: Support,  Prev: Utility,  Up: Top
+
+6 The Units Database
+********************
+
+The database for the UDUNITS-2 package comprises one XML file containing
+unit prefixes and four XML files containing unit definitions:
+
+   * SI unit prefixes (../../udunits/udunits2-prefixes.xml)
+   * SI base units (../../udunits/udunits2-base.xml)
+   * SI derived units (../../udunits/udunits2-derived.xml)
+   * Units accepted for use with the SI
+     (../../udunits/udunits2-accepted.xml)
+   * Non-SI units (../../udunits/udunits2-common.xml)
+
+
+File: udunits2.info,  Node: Support,  Next: Complete Index,  Prev: Database,  Up: Top
+
+7 Support for this Package
+**************************
+
+The home-page for this package can be found at
+<http://www.unidata.ucar.edu/software/udunits/>.
+
+   Bug reports should be sent to <support-udunits@unidata.ucar.edu>.
+
+
+File: udunits2.info,  Node: Complete Index,  Prev: Support,  Up: Top
+
+Index
+*****
+
+ [index ]
+* Menu:
+
+* database:                              Database.              (line 6)
+* installation:                          Installation.          (line 6)
+* installation, binary:                  Binary.                (line 6)
+* installation, source:                  Source.                (line 6)
+* installing from source on Unix:        Unix.                  (line 6)
+* installing from source on Windows:     Windows.               (line 6)
+* Introduction:                          Introduction.          (line 6)
+* Library, unit:                         Library.               (line 6)
+* package, support:                      Support.               (line 6)
+* prerequisites for this package:        Prerequisites.         (line 6)
+* support:                               Support.               (line 6)
+* Utility, unit:                         Utility.               (line 6)
+
+
+
+Tag Table:
+Node: Top2109
+Node: Introduction4640
+Node: Differences5130
+Node: Installation7606
+Node: Prerequisites7938
+Node: Binary8587
+Node: Source9409
+Node: Unix9700
+Node: Windows10639
+Node: Library11839
+Node: Utility12039
+Node: Database12236
+Node: Support12807
+Node: Complete Index13118
+
+End Tag Table
