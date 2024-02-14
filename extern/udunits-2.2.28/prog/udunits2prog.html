@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Copyright 2014 University Corporation for Atmospheric Research and contributors.
+All rights reserved.
+
+This software was developed by the Unidata Program Center of the
+University Corporation for Atmospheric Research (UCAR)
+<http://www.unidata.ucar.edu>.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1) Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+   2) Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+   3) Neither the names of the development group, the copyright holders, nor the
+      names of contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+   4) This license shall terminate automatically and you may no longer exercise
+      any of the rights granted to you by this license as of the date you
+      commence an action, including a cross-claim or counterclaim, against
+      the copyright holders or any contributor alleging that this software
+      infringes a patent. This termination provision shall not apply for an
+      action alleging patent infringement by combinations of this software with
+      other software or hardware.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE. -->
+<!-- Created by GNU Texinfo 5.1, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>udunits2 Program Guide</title>
+
+<meta name="description" content="udunits2 Program Guide">
+<meta name="keywords" content="udunits2 Program Guide">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="#Top" rel="start" title="Top">
+<link href="#Complete-Index" rel="index" title="Complete Index">
+<link href="#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="dir.html#Top" rel="up" title="(dir)">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<h1 class="settitle" align="center">udunits2 Program Guide</h1>
+
+
+<a name="SEC_Contents"></a>
+<h2 class="contents-heading">Table of Contents</h2>
+
+<div class="contents">
+
+<ul class="no-bullet">
+  <li><a name="toc-Synopsis-1" href="#Synopsis">1 Synopsis</a></li>
+  <li><a name="toc-Options-1" href="#Options">2 Options</a></li>
+  <li><a name="toc-Description-1" href="#Description">3 Description</a></li>
+  <li><a name="toc-See-Also-1" href="#See-Also">4 See Also</a></li>
+  <li><a name="toc-Index" href="#Complete-Index">Index</a></li>
+</ul>
+</div>
+
+
+<a name="Top"></a>
+<div class="header">
+<p>
+Next: <a href="#Synopsis" accesskey="n" rel="next">Synopsis</a>, Previous: <a href="dir.html#Top" accesskey="p" rel="previous">(dir)</a>, Up: <a href="dir.html#Top" accesskey="u" rel="up">(dir)</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Complete-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="udunits2"></a>
+<h1 class="top">udunits2</h1>
+<p>This manual describes how to use the <code>udunits2</code> program.
+This program allows you to discover the definition of a unit
+as well as convert numeric values between compatible units.
+</p>
+<p>Copyright 2014 University Corporation for Atmospheric Research and contributors.
+All rights reserved.
+</p>
+<p>This software was developed by the Unidata Program Center of the
+University Corporation for Atmospheric Research (UCAR)
+&lt;http://www.unidata.ucar.edu&gt;.
+</p>
+<p>Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+</p>
+<p>1) Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+   2) Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+   3) Neither the names of the development group, the copyright holders, nor the
+      names of contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+   4) This license shall terminate automatically and you may no longer exercise
+      any of the rights granted to you by this license as of the date you
+      commence an action, including a cross-claim or counterclaim, against
+      the copyright holders or any contributor alleging that this software
+      infringes a patent. This termination provision shall not apply for an
+      action alleging patent infringement by combinations of this software with
+      other software or hardware.
+</p>
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+</p>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Synopsis" accesskey="1">Synopsis</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Terse usage example
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Options" accesskey="2">Options</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Command-line options
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Description" accesskey="3">Description</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Description of the program
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#See-Also" accesskey="4">See Also</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Additional information
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Complete-Index" accesskey="5">Complete Index</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Complete index
+</td></tr>
+</table>
+
+<hr>
+<a name="Synopsis"></a>
+<div class="header">
+<p>
+Next: <a href="#Options" accesskey="n" rel="next">Options</a>, Previous: <a href="#Top" accesskey="p" rel="previous">Top</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Complete-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="Synopsis-1"></a>
+<h2 class="chapter">1 Synopsis</h2>
+<a name="index-synopsis"></a>
+
+<div class="example">
+<pre class="example">udunits2 -h
+</pre></div>
+
+<div class="example">
+<pre class="example">udunits2 [-A|-L|-U] [-r] [-H have] [-W want] [XML_file]
+</pre></div>
+
+<hr>
+<a name="Options"></a>
+<div class="header">
+<p>
+Next: <a href="#Description" accesskey="n" rel="next">Description</a>, Previous: <a href="#Synopsis" accesskey="p" rel="previous">Synopsis</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Complete-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="Options-1"></a>
+<h2 class="chapter">2 Options</h2>
+<a name="index-options"></a>
+
+<p>The following options and arguments are supported:
+</p>
+<dl compact="compact">
+<dt><code>-A</code></dt>
+<dd><p>Use the ASCII character-set.
+</p></dd>
+<dt><code>-L</code></dt>
+<dd><p>Use the ISO Latin-1 (ISO-8859-1) character-set.
+</p></dd>
+<dt><code>-U</code></dt>
+<dd><p>Use the full Unicode character-set with UTF-8 encoding.
+</p></dd>
+<dt><code>-h</code></dt>
+<dd><p>Print a help message.
+</p></dd>
+<dt><code>-r</code></dt>
+<dd><p>Reveal any problems with the units database (by default, no error messages are
+printed during import of the database).
+</p></dd>
+<dt><code>-H have</code></dt>
+<dd><p>Use <code>have</code> unit for conversion. The default is the reply to the prompt.
+</p></dd>
+<dt><code>-W want</code></dt>
+<dd><p>Use <code>want</code> unit for conversion. An empty string requests the definition of
+the <code>have</code> unit. The default is the reply to the prompt.
+</p></dd>
+<dt><code>XML_file</code></dt>
+<dd><p>The pathname of the XML-formatted units database.
+If not specified, then the default, compile-time pathname is used.
+</p></dd>
+</dl>
+
+<hr>
+<a name="Description"></a>
+<div class="header">
+<p>
+Next: <a href="#See-Also" accesskey="n" rel="next">See Also</a>, Previous: <a href="#Options" accesskey="p" rel="previous">Options</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Complete-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="Description-1"></a>
+<h2 class="chapter">3 Description</h2>
+
+<p>When successfully started without the <code>-H have</code> or <code>-W want</code> options,
+the program will print the prompt
+</p>
+<div class="example">
+<pre class="example">You have: 
+</pre></div>
+
+<p>At this point you can exit the program by entering the end-of-file character
+(usually control-D) or continue by entering either a value or a unit.
+(a value comprises a numerical value and a unit.
+For example, 
+</p>
+<div class="example">
+<pre class="example">You have: 80 km/h
+You want: 
+</pre></div>
+
+<p>At this point, if you enter a blank line, then the program will assume
+that you entered a unit in the previous line and will print
+the definition of that unit in terms of the base units of the
+unit-system that it imported on startup.  For example,
+</p>
+<div class="example">
+<pre class="example">You have: 80 km/h
+You want: 
+    22.2222222222222 m.s-1
+You have:
+</pre></div>
+
+<p>Details of the formatting depend on the character-set being used.
+See <a href="#Options">Options</a>.
+</p>
+<p>Alternatively, at the &ldquo;<kbd>You want:</kbd>&rdquo; prompt you can enter the unit
+in which you want the previously-entered value.
+For example,
+</p>
+<div class="example">
+<pre class="example">You have: 80 km/h
+You want: mi/h
+    80 km/h = 49.7097 mi/h
+    x/(mi/h) = 0.621371*(x/(km/h))
+You have:
+</pre></div>
+
+<p>The first line after &ldquo;<kbd>You want:</kbd>&rdquo; shows the &ldquo;have&rdquo; value in the 
+desired &ldquo;want&rdquo; unit.
+</p>
+<p>The second line shows the transformation between numerical values
+in the &ldquo;have&rdquo; unit to numerical values in the &ldquo;want&rdquo; unit.  The
+symbol &ldquo;<kbd>x</kbd>&rdquo; represents the physical quantity in question.
+See <a href="http://physics.nist.gov/Pubs/SP811/sec07.html">http://physics.nist.gov/Pubs/SP811/sec07.html</a>.
+</p>
+<hr>
+<a name="See-Also"></a>
+<div class="header">
+<p>
+Next: <a href="#Complete-Index" accesskey="n" rel="next">Complete Index</a>, Previous: <a href="#Description" accesskey="p" rel="previous">Description</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Complete-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="See-Also-1"></a>
+<h2 class="chapter">4 See Also</h2>
+
+<p>See <a href="udunits2lib.html#Top">UDUNITS-2</a> in <cite>The UDUNITS-2 C API Guide</cite>, for
+information on the UDUNITS-2 library, which is used by this program.
+</p>
+<hr>
+<a name="Complete-Index"></a>
+<div class="header">
+<p>
+Previous: <a href="#See-Also" accesskey="p" rel="previous">See Also</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Complete-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<a name="Index"></a>
+<h2 class="unnumbered">Index</h2>
+
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Complete-Index_cp_letter-O"><b>O</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Complete-Index_cp_letter-S"><b>S</b></a>
+ &nbsp; 
+</td></tr></table>
+<table class="index-cp" border="0">
+<tr><td></td><th align="left">Index Entry</th><td>&nbsp;</td><th align="left"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Complete-Index_cp_letter-O">O</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-options">options</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Options">Options</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Complete-Index_cp_letter-S">S</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-synopsis">synopsis</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Synopsis">Synopsis</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+</table>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Complete-Index_cp_letter-O"><b>O</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Complete-Index_cp_letter-S"><b>S</b></a>
+ &nbsp; 
+</td></tr></table>
+
+<hr>
+
+
+
+</body>
+</html>

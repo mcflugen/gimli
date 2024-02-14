@@ -1,0 +1,293 @@
+\input texinfo  @c -*-texinfo-*-
+@c %**start of header
+@setfilename udunits2.info
+
+@include version.texi
+
+@settitle UDUNITS @value{VERSION} Manual
+@c %**end of header
+@dircategory Science
+@direntry
+* udunits-2: (udunits2).  The Unidata package for units of physical quantities.
+@end direntry
+@copying
+@include COPYRIGHT
+@end copying
+
+@titlepage
+@title The UDUNITS-2 Package
+@author Steven R. Emmerson
+
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top, Introduction, (dir), (dir)
+@top UDUNITS-2
+This manual describes the UDUNITS-2 package, which contains
+a C library for units of physical quantities and a unit-definition
+and value-conversion utility.
+
+@insertcopying
+@end ifnottex
+
+@menu
+* Introduction::        Introduction
+* Differences::		    How this package differs from the UDUNITS-1 package
+* Installation::        Installing this package
+* Library::             The unit library
+* Utility::             The unit utility
+* Database::            The unit database
+* Support::             Support for this package
+* Complete Index::      Complete index
+@end menu
+
+@node Introduction, Differences, Top, Top
+@chapter Introduction
+@cindex Introduction
+
+The UDUNITS-2 package provides support for units of physical quantities.
+Its three main components are: 1) @ref{Top, , a C library, udunits2lib}
+for units of physical quantities;
+2) @ref{Top, , a utility, udunits2prog};
+for obtaining the definition of a unit and for
+converting numeric values between compatible units;
+and 3) an @ref{Database, , extensive database of units}.
+
+@node Differences, Installation, Introduction, Top
+@chapter How This Package Differs from the Original @code{UDUNITS} Package
+
+The @code{UDUNIT-2} package differs from the @code{UDUNITS-1}
+package in the following ways:
+@itemize @bullet
+
+@item @strong{Support for non-ASCII characters:}  
+The @code{UDUNITS-1}
+package only supports the ASCII character set.  The @code{UDUNITS-2}
+package supports the following character sets: ASCII, ISO 8859-1 (Latin-1),
+and the UTF-8 encoding of ISO 10646 (Unicode).  This means that unit
+string specifications like "@code{µ°F·Ω⁻¹}" are now supported (your
+viewer must support UTF-8 to display this string correctly).
+
+@item @strong{Support for logarithmic units:}  The unit string
+specification "@code{0.1 lg(re 1 mW)}" specifies a deciBel unit with a
+one milliwatt reference level.
+Such units are fully integrated into the package and all meaningful
+operations and conversions are supported.
+
+@item @strong{Persistent value converters:}
+It is now possible to obtain a @emph{converter} data-object, which can
+be used to convert numeric values in one unit to numeric values in another,
+compatible unit.  The values can be @code{float}, @code{double}, or
+one-dimensional arrays of @code{float}s or @code{double}s.
+
+@item @strong{Improved API:}  Due to the above changes, it was not
+possible to keep the application programming interface (API) of the
+@code{UDUNITS-1} package.  The new interface, however, is easily
+understood and easy to use.  To support backward comptibility,
+the package does contain a version 1 C API, which uses the version 2
+library.
+
+@item @strong{XML unit database:}  The unit database is encoded using
+human-readable XML rather than a custom format.  The XML
+parser included in the package supports an @emph{<import>} element to
+allow easy and convenient customization.
+
+@item @strong{No Fortran or Perl API:}  Interfaces for these languages
+have not yet been created.  Contact
+@email{support-udunits@@unidata.ucar.edu} if you are interested in
+helping to create these interfaces.
+
+@end itemize
+
+One thing that has not changed is that almost all unit string specifications
+understood by the @code{UDUNITS-1} package are also
+understood by the @code{UDUNITS-2} package.  One exception is
+the symbol @code{g}, which in version 1 of the package was associated with
+standard free fall (a unit of acceleration) but which is associated
+with the unit gram in version 2 of the package.
+
+@node Installation, Library, Differences, Top
+@chapter Installing this Package
+@cindex installation
+
+@ignore
+
+@menu
+* Prerequisites::       Prerequisites for this package
+* Obtain::              Obtaining this package
+* Unix::                Installing on Unix-like environments
+* Windows::             Installing on Windows environments
+@end menu
+
+@node Prerequisites, Obtain, , Installation
+@section Prerequisites for This Package
+@cindex prerequisites for this package
+
+The Expat library and header-files must be installed. Look for the library 
+"libexpat" and the header-file "expat.h".
+
+If this package is to be tested (which is optional), then the CUnit library
+and header-files must be installed. Look for the library "libcunit" and the
+header-files "CUnit/CUnit.h" and "CUnit/Basic.h".
+
+If this package is to be built on a Windows system, then the CMake and MinGW
+packages must be installed. Look for the utility "cmake" and the
+directory/folder "MinGW".
+
+@end ignore
+
+@menu
+* Prerequisites::       Prerequisites for this package
+* Binary::              Installing from a binary distribution
+* Source::              Installing from a source distribution
+@end menu
+
+@node Prerequisites, Binary, , Installation
+@section Prerequisites for This Package
+@cindex prerequisites for this package
+
+The Expat library and header-files must be installed. Look for the library 
+"libexpat" and the header-file "expat.h".
+
+If this package is to be tested (which is optional), then the CUnit library
+and header-files must be installed. Look for the library "libcunit" and the
+header-files "CUnit/CUnit.h" and "CUnit/Basic.h".
+
+If this package is to be built on a Windows system, then the CMake and MinGW
+packages must be installed. Look for the utility "cmake" and the
+directory/folder "MinGW".
+
+@node Binary, Source, Prerequisites, Installation
+@section Installing from a Binary Distribution
+@cindex installation, binary
+
+Currently, only an RPM binary distribution is supported.
+
+Download the distribution by browsing to the Unidata UDUNITS RPM repository at
+@uref{https://artifacts.unidata.ucar.edu/service/rest/repository/browse/rpm-udunits/udunits/}
+or by executing, for example, the following commands:
+@example
+cd ~/Downloads
+wget https://artifacts.unidata.ucar.edu/repository/rpm-udunits/udunits/udunits-@value{VERSION}-x86_64.rpm
+@end example
+
+Install the distribution. For example,
+@example
+sudo rpm --install [--prefix=/opt/udunits] ~/Downloads/udunits-@value{VERSION}-x86_64.rpm
+@end example
+where the argument in square brackets is optional. The default installation
+directory is @code{/usr/local}.
+
+@node Source, , Binary, Installation
+@section Installing from a Source Distribution
+@cindex installation, source
+
+@menu
+* Unix::     Building and installing in Unix-like environments
+* Windows::  Building and installing in Windows environments
+@end menu
+
+@node Unix, Windows, , Source
+@subsection Installing from source on Unix
+@cindex installing from source on Unix
+
+Download the source by browsing to the Unidata UDUNITS source repository at
+@uref{https://artifacts.unidata.ucar.edu/service/rest/repository/browse/downloads-udunits/}
+or by executing, for example, the following commands:
+@example
+cd ~/Downloads
+curl -O https://artifacts.unidata.ucar.edu/repository/downloads-udunits/udunits-@value{VERSION}.tar.gz
+@end example
+
+Unpack the distribution in an appropriate place. For example,
+@example
+cd /opt
+sudo pax -rz < ~/Downloads/udunits-@value{VERSION}.tar.gz
+@end example
+
+Build and install the package. For example
+@example
+cd udunits2-@value{VERSION}
+./configure [--prefix=@var{install_prefix}] >&configure.log
+make all [check] install [install-html] [install-pdf]
+@end example
+where the arguments in square brackets are optional. The default installation 
+prefix is the parent directory of the source directory.
+
+@node Windows, , Unix, Source
+@subsection Installing from source on Windows
+@cindex installing from source on Windows
+
+Download the source by browsing to the Unidata UDUNITS source repository at
+@uref{https://artifacts.unidata.ucar.edu/service/rest/repository/browse/downloads-udunits/}
+or by executing, for example, the following commands:
+@example
+cd C:\Users\@var{current_user}\Downloads
+curl -O https://artifacts.unidata.ucar.edu/repository/downloads-udunits/udunits-@value{VERSION}.zip
+@end example
+
+Unpack the distribution by opening the downloaded file and extracting the
+contents to, for example, the user's "Downloads" folder. Note that, by default,
+the extractor might create an extra top-level folder with a duplicate name.
+Remove the extra folder from the destination path if this is the case -- either
+before or after extraction.
+
+Build and install the package using cmake(1). For example
+@example
+cd C:\Users\@var{current_user}\Downloads\udunits2-@value{VERSION}
+mkdir build
+cd build
+cmake [-D CMAKE_INSTALL_PREFIX=@var{install_prefix}] ..
+make all install
+@end example
+where the argument in square brackets is optional. The default installation 
+folder is the parent folder of the source folder.
+
+@node Library, Utility, Installation, Top
+@chapter Unit Library
+@cindex Library,  unit
+@xref{UDUNITS Library, , , udunits2lib}, for details on this package's unit library.
+
+@node Utility, Database, Library, Top
+@chapter Unit Utility
+@cindex Utility,  unit
+@xref{UDUNITS Utility, , , udunits2prog}, for details on this package's unit
+utility.
+
+@node Database, Support, Utility, Top
+@chapter The Units Database
+@cindex database
+
+The database for the UDUNITS-2 package comprises one XML file containing
+unit prefixes and four XML files containing unit definitions:
+
+@itemize
+@item @uref{../../udunits/udunits2-prefixes.xml,SI unit prefixes}
+@item @uref{../../udunits/udunits2-base.xml,SI base units}
+@item @uref{../../udunits/udunits2-derived.xml,SI derived units}
+@item @uref{../../udunits/udunits2-accepted.xml,Units accepted for use with the SI}
+@item @uref{../../udunits/udunits2-common.xml,Non-SI units}
+@end itemize
+
+@node Support, Complete Index, Database, Top
+@chapter Support for this Package
+@cindex support
+@cindex package, support
+
+The home-page for this package can be found at
+@uref{http://www.unidata.ucar.edu/software/udunits/}.
+
+Bug reports should be sent to
+@email{support-udunits@@unidata.ucar.edu}.
+
+@node Complete Index, , Support, Top
+@unnumbered Index
+
+@printindex cp
+
+@bye
