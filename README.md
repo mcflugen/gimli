@@ -35,7 +35,8 @@ see a full listing of the requirements, have a look at the project's
 
 ## Installation
 
-```pip install gimli.units
+```
+pip install gimli.units
 ```
 or
 ```
@@ -56,7 +57,7 @@ using `conda`,
 conda install udunits2 -c conda-forge
 ```
 
-or building `udunits2` from source (we use a
+or by building `udunits2` from source (we use a
 [vendored version](#notice-of-vendored-libraries) of `udunits2`,
 which can be found in the `extern` folder of this repository).
 
