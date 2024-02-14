@@ -22,8 +22,6 @@ An object-oriented Python interface to [udunits2][udunits-link] built with cytho
 
 ## Requirements
 
-*gimli.units* requires *udunits2*.
-
 *udunits2* is the unit conversion C library that
 *gimli* wraps using *cython*. The easiest way to install *udunits2* is
 through Anaconda (see the Install section), or *yum* (as *udunits2-devel*
@@ -37,46 +35,36 @@ see a full listing of the requirements, have a look at the project's
 
 ## Installation
 
-To install *gimli*, first create a new environment in which *gimli* will
-be installed. This, although not necessary, will isolate the
-installation so that there won't be conflicts with your base *Python*
-installation. This can be done with *conda* as:
-
+```pip install gimli.units
 ```
-conda create -n gimli python=3
-conda activate gimli
-```
-
-## Stable Release
-
-*gimli*, and its dependencies, can be installed either with *pip* or
-*conda*. Using *pip*:
-
-```
-pip install gimli.units
-```
-
-Using *conda*:
-
+or
 ```
 conda install gimli.units -c conda-forge
 ```
 
 ### From Source
 
-After downloading the *gimli* source code, run the following from
-*gimli*'s top-level folder (the one that contains *setup.py*) to install
-*gimli* into the current environment:
+```
+pip install git+https://github.com/mcflugen/gimli.git
+```
+
+Note: `gimli.units` requires the `libudunits` library. You will need to
+have this installed before building `gimli.units`. You can do this
+using `conda`,
 
 ```
-pip install -e .
+conda install udunits2 -c conda-forge
 ```
+
+or building `udunits2` from source (we use a
+[vendored version](#notice-of-vendored-libraries) of `udunits2`,
+which can be found in the `extern` folder of this repository).
 
 ## Usage
 
-Primarily, *gimli.units* is a Python library with an API that reflects that of
+Primarily, *gimli.units* is a Python module with an [API](#API) that reflects that of
 the *udunits2* library. *gimli*, however, also comes with a
-command-line interface.
+[command-line interface](#command-line-interface).
 
 # API
 
@@ -172,13 +160,13 @@ external dependencies.
 
 ### Reasons for Vendoring
 
+- **`udunits`**: A library for units of physical quantities, vendored
+  to provide robust unit conversion and management, ensuring compatibility
+  and consistency in unit operations.
 - **`expat`**: An XML parser library written in C, vendored to ensure
   consistent and reliable XML parsing across various platforms and
   environments without requiring separate installation of the library.
   `expat` is a dependency of `udunits`.
-- **`udunits`**: A library for units of physical quantities, vendored
-  to provide robust unit conversion and management, ensuring compatibility
-  and consistency in unit operations.
 
 ### Implications for Users
 
@@ -189,14 +177,14 @@ external dependencies.
   significantly impact the installation and usage experience.
 - **Compatibility**: Vendoring these libraries helps us manage
   compatibility and reliability issues, as we use specific versions
-  tested to work seamlessly with our package.
+  tested to work with our package.
 
 ### Licensing
 
-- **`expat` License**: [License Information for expat][expat-license]
 - **`udunits` License**: [License Information for udunits][udunits-license]
 - Our use of these vendored libraries complies with their respective
   licenses. Users of our package are also subject to these terms.
+- **`expat` License**: [License Information for expat][expat-license]
 
 ### Updates and Security
 
@@ -206,5 +194,5 @@ external dependencies.
 
 ### Further Information
 
-- For more details about `expat`, please visit [expat's website][expat-github].
 - For more information on `udunits`, refer to [udunits' website][udunits-link].
+- For more details about `expat`, please visit [expat's website][expat-github].
