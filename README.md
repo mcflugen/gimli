@@ -20,18 +20,10 @@
 
 An object-oriented Python interface to [udunits2][udunits-link] built with cython.
 
-## Requirements
-
-*udunits2* is the unit conversion C library that
-*gimli* wraps using *cython*. The easiest way to install *udunits2* is
-through Anaconda (see the Install section), or *yum* (as *udunits2-devel*
-on ubuntu-based Linux). It can, however, also be compiled and installed from source.
-You can get the source code either as a [.tar.gz][udunits-download] or from
-[GitHub][udunits-github].
-
-All other requirements are available using either *pip* or *conda*. To
-see a full listing of the requirements, have a look at the project's
-*requirements.in* file.
+```{note}
+The distributed wheels contain a vendored version of `udunits2` and
+so `udunits` does not have to be installed separately.
+```
 
 ## Installation
 
@@ -49,7 +41,7 @@ conda install gimli.units -c conda-forge
 pip install git+https://github.com/mcflugen/gimli.git
 ```
 
-Note: `gimli.units` requires the `libudunits` library. You will need to
+`gimli.units` requires the `libudunits` library. You will need to
 have this installed before building `gimli.units`. You can do this
 using `conda`,
 
@@ -60,6 +52,8 @@ conda install udunits2 -c conda-forge
 or by building `udunits2` from source (we use a
 [vendored version](#notice-of-vendored-libraries) of `udunits2`,
 which can be found in the `extern` folder of this repository).
+You can get the latest version of the `udunits2` source code either
+as a [.tar.gz][udunits-download] or from [GitHub][udunits-github].
 
 ## Usage
 
