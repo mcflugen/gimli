@@ -4,8 +4,6 @@ from __future__ import annotations
 import os
 import pathlib
 import sys
-from enum import Enum
-from enum import Flag
 
 import numpy as np
 
@@ -14,8 +12,14 @@ from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.string cimport strcpy
 
+from gimli._constants import UDUNITS_ENCODING
+from gimli._constants import UnitEncoding
+from gimli._constants import UnitFormatting
+from gimli._constants import UnitStatus
 from gimli._utils import suppress_stdout
 from gimli.errors import IncompatibleUnitsError
+from gimli.errors import UnitError
+from gimli.errors import UnitNameError
 
 if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
     import importlib.resources as importlib_resources
@@ -27,92 +31,6 @@ FLOAT = np.float32
 
 ctypedef np.double_t DOUBLE_t
 ctypedef np.float_t FLOAT_t
-
-
-class UnitError(Exception):
-
-    def __init__(self, code: int, msg: str =""):
-        self._code = code
-        self._msg = msg
-
-    def __str__(self) -> str:
-        msg = self._msg or STATUS_MESSAGE.get(self._code, "Unknown")
-        return "{0} (status {1})".format(msg, self._code)
-
-
-class UnitNameError(UnitError):
-
-    def __init__(self, name: str, code: int):
-        self._name = name
-        self._code = code
-
-    def __str__(self) -> str:
-        return "{0!r}: {1} (status {2})".format(
-            self._name, STATUS_MESSAGE.get(self._code, "Unknown"), self._code
-        )
-
-
-class UnitEncoding(int, Enum):
-    ASCII = 0
-    ISO_8859_1 = 1
-    LATIN1 = 1
-    UTF8 = 2
-
-
-UDUNITS_ENCODING = {
-    "ascii": UnitEncoding.ASCII,
-    "us-ascii": UnitEncoding.ASCII,
-    "iso-8859-1": UnitEncoding.ISO_8859_1,
-    "iso8859-1": UnitEncoding.ISO_8859_1,
-    "latin-1": UnitEncoding.LATIN1,
-    "latin1": UnitEncoding.LATIN1,
-    "utf-8": UnitEncoding.UTF8,
-    "utf8": UnitEncoding.UTF8,
-}
-
-
-class UnitFormatting(int, Flag):
-    NAMES = 4
-    DEFINITIONS = 8
-
-
-class UnitStatus(int, Enum):
-    SUCCESS = 0
-    BAD_ARG = 1
-    EXISTS = 2
-    NO_UNIT = 3
-    OS = 4
-    NOT_SAME_SYSTEM = 5
-    MEANINGLESS = 6
-    NO_SECOND = 7
-    VISIT_ERROR = 8
-    CANT_FORMAT = 9
-    SYNTAX = 10
-    UNKNOWN = 11
-    OPEN_ARG = 12
-    OPEN_ENV = 13
-    OPEN_DEFAULT = 14
-    PARSE = 15
-
-
-STATUS_MESSAGE = {
-    UnitStatus.SUCCESS: "Success",
-    UnitStatus.BAD_ARG:	"An argument violates the function's contract",
-    UnitStatus.EXISTS: "Unit, prefix, or identifier already exists",
-    UnitStatus.NO_UNIT: "No such unit exists",
-    UnitStatus.OS: "Operating-system error.  See 'errno'",
-    UnitStatus.NOT_SAME_SYSTEM: "The units belong to different unit-systems",
-    UnitStatus.MEANINGLESS: "The operation on the unit(s) is meaningless",
-    UnitStatus.NO_SECOND: "The unit-system doesn't have a unit named 'second'",
-    UnitStatus.VISIT_ERROR: "An error occurred while visiting a unit",
-    UnitStatus.CANT_FORMAT: "A unit can't be formatted in the desired manner",
-    UnitStatus.SYNTAX: "string unit representation contains syntax error",
-    UnitStatus.UNKNOWN: "string unit representation contains unknown word",
-    UnitStatus.OPEN_ARG: "Can't open argument-specified unit database",
-    UnitStatus.OPEN_ENV: "Can't open environment-specified unit database",
-    UnitStatus.OPEN_DEFAULT: "Can't open installed, default, unit database",
-    UnitStatus.PARSE: "Error parsing unit specification",
-}
 
 
 cdef extern from "udunits2.h":
@@ -154,39 +72,6 @@ cdef extern from "udunits2.h":
     void cv_free(cv_converter* conv)
 
     ut_status ut_get_status()
-
-
-class UnitSystem(_UnitSystem):
-
-    """A system of units.
-
-    A unit-system is a set of units that are all defined in terms of
-    the same set of base units. In the SI system of units, for example,
-    the base units are the meter, kilogram, second, ampere, kelvin,
-    mole, and candela. (For definitions of these base units,
-    see http://physics.nist.gov/cuu/Units/current.html)
-
-    In the UDUNITS-2 package, every accessible unit belongs to one and
-    only one unit-system. It is not possible to convert numeric values
-    between units of different unit-systems. Similarly, units belonging
-    to different unit-systems always compare unequal.
-
-    Parameters
-    ----------
-    filepath : str, optional
-        Path to a *udunits2* xml-formatted unit database. If not provided,
-        a default system of units is used.
-    """
-    def __init__(self, filepath: str | None=None):
-        self._registry = dict()
-
-    def __getitem__(self, key: str) -> Unit:
-        try:
-            return self._registry[key]
-        except KeyError:
-            pass
-        self._registry[key] = self.Unit(key)
-        return self._registry[key]
 
 
 cdef class _UnitSystem:
@@ -361,7 +246,7 @@ cdef class _UnitSystem:
         return str(self.database)
 
     def __repr__(self):
-        return "UnitSystem({0!r})".format(str(self.database))
+        return "UnitSystem({str(self.database)!r})"
 
     def __eq__(self, other):
         return self.database.samefile(other.database)

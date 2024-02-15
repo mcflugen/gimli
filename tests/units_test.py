@@ -9,10 +9,10 @@ from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal
 
 import gimli
-from gimli import UnitFormatting
-from gimli import UnitNameError
-from gimli import UnitStatus
-from gimli import UnitSystem
+from gimli._constants import UnitFormatting
+from gimli._constants import UnitStatus
+from gimli._system import UnitSystem
+from gimli.errors import UnitNameError
 
 
 @pytest.fixture(scope="module")

@@ -5,12 +5,12 @@ from typing import Any
 
 import numpy as np
 
-from gimli._udunits2 import IncompatibleUnitsError
-from gimli._udunits2 import UnitNameError
-from gimli._udunits2 import UnitSystem
+from gimli._system import UnitSystem
 from gimli._utils import err
 from gimli._utils import out
 from gimli._version import __version__
+from gimli.errors import IncompatibleUnitsError
+from gimli.errors import UnitNameError
 
 system = UnitSystem()
 
