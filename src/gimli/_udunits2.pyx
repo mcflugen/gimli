@@ -95,7 +95,7 @@ cdef class _UnitSystem:
             raise UnitError(status)
 
     @staticmethod
-    def get_xml_path(filepath: str | None=None) -> str:
+    def get_xml_path(filepath: str | None=None) -> tuple[str, UnitStatus]:
         """Get the path to a unit database.
 
         Parameters
@@ -248,7 +248,7 @@ cdef class _UnitSystem:
         return "UnitSystem({str(self.database)!r})"
 
     def __eq__(self, other):
-        return self.database.samefile(other.database)
+        return os.path.samefile(self.database, other.database)
 
 
 cdef class Unit:
