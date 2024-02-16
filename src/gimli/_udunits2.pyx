@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import sys
 
 import numpy as np
@@ -83,7 +82,7 @@ cdef class _UnitSystem:
         cdef char* path
 
         filepath, self._status = _UnitSystem.get_xml_path(filepath)
-        as_bytes = str(filepath).encode("utf-8")
+        as_bytes = filepath.encode("utf-8")
 
         self._filepath = <char*>malloc((len(as_bytes) + 1) * sizeof(char))
         strcpy(self._filepath, as_bytes)
@@ -96,7 +95,7 @@ cdef class _UnitSystem:
             raise UnitError(status)
 
     @staticmethod
-    def get_xml_path(filepath=None):
+    def get_xml_path(filepath: str | None=None) -> str:
         """Get the path to a unit database.
 
         Parameters
@@ -126,7 +125,7 @@ cdef class _UnitSystem:
                 status = UnitStatus.OPEN_ENV
         else:
             status = UnitStatus.OPEN_ARG
-        return pathlib.Path(filepath), status
+        return filepath, status
 
     def dimensionless_unit(self):
         """The dimensionless unit used by the unit system.
@@ -211,9 +210,9 @@ cdef class _UnitSystem:
 
 
     @property
-    def database(self):
+    def database(self) -> str:
         """Path to the unit-database being used."""
-        return pathlib.Path(self._filepath.decode())
+        return self._filepath.decode()
 
     @property
     def status(self):
