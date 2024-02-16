@@ -33,4 +33,4 @@ class UnitNameError(UnitError):
         self._msg = STATUS_MESSAGE.get(self._code, "Unknown")
 
     def __str__(self) -> str:
-        return "{0!r}: {self._msg} (status {2})"
+        return f"{self._name!r}: {self._msg} (status {self._code})"
