@@ -15,21 +15,23 @@ from gimli._constants import UDUNITS_ENCODING
 from gimli._constants import UnitEncoding
 from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
+from gimli._utils import get_xml_path
 from gimli._utils import suppress_stdout
 from gimli.errors import IncompatibleUnitsError
-from gimli.errors import UnitError
-from gimli.errors import UnitNameError
-
-if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
-    import importlib.resources as importlib_resources
-else:  # pragma: no cover (<PY312)
-    import importlib_resources
 
 DOUBLE = np.double
 FLOAT = np.float32
 
 ctypedef np.double_t DOUBLE_t
 ctypedef np.float_t FLOAT_t
+
+
+class UdunitsError(Exception):
+    def __init__(self, code):
+        self.code = code
+
+    def __str__(self):
+        return f"udunits error ({self.code})"
 
 
 cdef extern from "udunits2.h":
@@ -81,7 +83,7 @@ cdef class _UnitSystem:
     def __cinit__(self, filepath=None):
         cdef char* path
 
-        filepath, self._status = _UnitSystem.get_xml_path(filepath)
+        filepath, self._status = get_xml_path(filepath)
         as_bytes = filepath.encode("utf-8")
 
         self._filepath = <char*>malloc((len(as_bytes) + 1) * sizeof(char))
@@ -92,40 +94,7 @@ cdef class _UnitSystem:
 
         if self._unit_system == NULL:
             status = ut_get_status()
-            raise UnitError(status)
-
-    @staticmethod
-    def get_xml_path(filepath: str | None=None) -> tuple[str, UnitStatus]:
-        """Get the path to a unit database.
-
-        Parameters
-        ----------
-        filepath : str, optional
-            The path to an xml-formatted unit database. If not provided, use
-            the value of the *UDUNITS2_XML_PATH* environment variable,
-            otherwise use a default unit database.
-
-        Returns
-        -------
-        str
-            The path to a units database.
-        """
-        if filepath is None:
-            try:
-                filepath = os.environ["UDUNITS2_XML_PATH"]
-            except KeyError:
-                filepath = str(
-                    importlib_resources.files("gimli") / "data/udunits/udunits2.xml"
-                )
-                # filepath = pkg_resources.resource_filename(
-                #     "gimli", "data/udunits/udunits2.xml"
-                # )
-                status = UnitStatus.OPEN_DEFAULT
-            else:
-                status = UnitStatus.OPEN_ENV
-        else:
-            status = UnitStatus.OPEN_ARG
-        return filepath, status
+            raise UdunitsError(status)
 
     def dimensionless_unit(self):
         """The dimensionless unit used by the unit system.
@@ -137,7 +106,7 @@ cdef class _UnitSystem:
         """
         cdef ut_unit* unit = ut_get_dimensionless_unit_one(self._unit_system)
         if unit == NULL:
-            raise UnitError(ut_get_status())
+            raise UdunitsError(ut_get_status())
         return Unit.from_ptr(unit, owner=False)
 
     def unit_by_name(self, name):
@@ -202,7 +171,7 @@ cdef class _UnitSystem:
         unit = ut_parse(self._unit_system, name.encode("utf-8"), UnitEncoding.UTF8)
         if unit == NULL:
             status = ut_get_status()
-            raise UnitNameError(name, status)
+            raise UdunitsError(status)
         if ut_is_dimensionless(unit):
             return Unit.from_ptr(unit, owner=False)
         else:
@@ -245,7 +214,7 @@ cdef class _UnitSystem:
         return str(self.database)
 
     def __repr__(self):
-        return "UnitSystem({str(self.database)!r})"
+        return f"UnitSystem({str(self.database)!r})"
 
     def __eq__(self, other):
         return os.path.samefile(self.database, other.database)
@@ -290,7 +259,8 @@ cdef class Unit:
 
         if converter == NULL:
             status = ut_get_status()
-            raise IncompatibleUnitsError(str(self), str(unit))
+            raise UdunitsError(status)
+            # raise IncompatibleUnitsError(str(self), str(unit))
 
         return UnitConverter.from_ptr(converter, owner=True)
 
@@ -371,7 +341,7 @@ cdef class Unit:
              if status == UnitStatus.SUCCESS:
                  return None
              else:
-                 raise UnitError(status)
+                 raise UdunitsError(status)
         else:
             return name.decode()
 
@@ -390,7 +360,7 @@ cdef class Unit:
              if status == UnitStatus.SUCCESS:
                  return None
              else:
-                 raise UnitError(status)
+                 raise UdunitsError(status)
         else:
             return symbol.decode()
 
@@ -411,7 +381,7 @@ cdef class Unit:
             if status == UnitStatus.SUCCESS:
                 return False
             else:
-                raise UnitError(status)
+                raise UdunitsError(status)
 
 
     cpdef is_convertible_to(self, Unit unit):

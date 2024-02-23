@@ -4,6 +4,13 @@ import sys
 from collections.abc import Generator
 from functools import partial
 
+if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
+    import importlib.resources as importlib_resources
+else:  # pragma: no cover (<PY312)
+    import importlib_resources
+
+from gimli._constants import UnitStatus
+
 out = partial(print, file=sys.stderr)
 err = partial(print, file=sys.stderr)
 
@@ -25,3 +32,39 @@ def suppress_stdout() -> Generator[None, None, None]:
     # Close the null files
     for fd in null_fds + save_fds:
         os.close(fd)
+
+
+def get_xml_path(filepath: str | None = None) -> tuple[str, UnitStatus]:
+    """Get the path to a unit database.
+
+    Parameters
+    ----------
+    filepath : str, optional
+        The path to an xml-formatted unit database. If not provided, use
+        the value of the *UDUNITS2_XML_PATH* environment variable,
+        otherwise use a default unit database.
+
+    Returns
+    -------
+    str
+        The path to a units database.
+    """
+    if filepath is None:
+        try:
+            filepath = os.environ["UDUNITS2_XML_PATH"]
+        except KeyError:
+            filepath = str(
+                importlib_resources.files("gimli") / "data/udunits/udunits2.xml"
+            )
+            status = UnitStatus.OPEN_DEFAULT
+        else:
+            status = UnitStatus.OPEN_ENV
+    else:
+        status = UnitStatus.OPEN_ARG
+
+    if not os.path.isfile(filepath):
+        raise RuntimeError(
+            f"{filepath}: unable to locate units database (path does not exist)"
+        )
+
+    return filepath, status

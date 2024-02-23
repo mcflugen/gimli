@@ -12,6 +12,7 @@ import gimli
 from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._system import UnitSystem
+from gimli._utils import get_xml_path
 from gimli.errors import UnitNameError
 
 
@@ -23,16 +24,16 @@ def system():
 
 def test_get_xml():
     os.environ.pop("UDUNITS2_XML_PATH", None)
-    path, status = UnitSystem.get_xml_path()
+    path, status = get_xml_path()
     assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_DEFAULT
 
-    path, status = UnitSystem.get_xml_path(path)
+    path, status = get_xml_path(path)
     assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ARG
 
     os.environ["UDUNITS2_XML_PATH"] = str(path)
-    path, status = UnitSystem.get_xml_path()
+    path, status = get_xml_path()
     assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ENV
 
@@ -220,10 +221,11 @@ def test_unit_converter_same_units(system):
 )
 def test_unit_converter_bad_from_units(system, to_, from_):
     with pytest.raises(UnitNameError):
-        system.Unit(from_).to(system.Unit(to_))
+        system[from_].to(system[to_])
+        # system.Unit(from_).to(system.Unit(to_))
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_unit_converter_incompatible_units(system):
     with pytest.raises(gimli.errors.IncompatibleUnitsError):
         system.Unit("s").to(system.Unit("m"))
