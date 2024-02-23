@@ -220,14 +220,14 @@ def test_unit_converter_same_units(system):
     [("not_a_unit", "m"), ("m", "not_a_unit"), ("not_a_unit", "not_a_unit")],
 )
 def test_unit_converter_bad_from_units(system, to_, from_):
-    with pytest.raises(UnitNameError):
+    with pytest.raises(gimli._udunits2.UdunitsError):
         system[from_].to(system[to_])
         # system.Unit(from_).to(system.Unit(to_))
 
 
 # @pytest.mark.skip()
 def test_unit_converter_incompatible_units(system):
-    with pytest.raises(gimli.errors.IncompatibleUnitsError):
+    with pytest.raises(gimli._udunits2.UdunitsError):
         system.Unit("s").to(system.Unit("m"))
 
 
