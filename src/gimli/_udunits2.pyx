@@ -255,7 +255,8 @@ cdef class Unit:
         return self.UnitConverter(unit)
 
     cpdef UnitConverter(self, Unit unit):
-        converter = ut_get_converter(self._unit, unit._unit)
+        with suppress_stdout():
+            converter = ut_get_converter(self._unit, unit._unit)
 
         if converter == NULL:
             status = ut_get_status()
