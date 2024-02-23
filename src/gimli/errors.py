@@ -34,3 +34,15 @@ class UnitNameError(UnitError):
 
     def __str__(self) -> str:
         return f"{self._name!r}: {self._msg} (status {self._code})"
+
+
+class DatabaseNotFoundError(GimliError):
+    def __init__(self, path: str, status: int):
+        self._path = str(path)
+        self._status = status
+
+    def __str__(self) -> str:
+        return (
+            f"{self._path}: unable to locate units database"
+            f" ({self._status}): path does not exist"
+        )

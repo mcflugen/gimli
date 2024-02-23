@@ -10,6 +10,7 @@ else:  # pragma: no cover (<PY312)
     import importlib_resources
 
 from gimli._constants import UnitStatus
+from gimli.errors import DatabaseNotFoundError
 
 out = partial(print, file=sys.stderr)
 err = partial(print, file=sys.stderr)
@@ -63,8 +64,6 @@ def get_xml_path(filepath: str | None = None) -> tuple[str, UnitStatus]:
         status = UnitStatus.OPEN_ARG
 
     if not os.path.isfile(filepath):
-        raise RuntimeError(
-            f"{filepath}: unable to locate units database (path does not exist)"
-        )
+        raise DatabaseNotFoundError(filepath, status)
 
     return filepath, status

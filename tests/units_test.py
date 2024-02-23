@@ -13,7 +13,7 @@ from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._system import UnitSystem
 from gimli._utils import get_xml_path
-from gimli.errors import UnitNameError
+from gimli.errors import DatabaseNotFoundError
 
 
 @pytest.fixture(scope="module")
@@ -36,6 +36,9 @@ def test_get_xml():
     path, status = get_xml_path()
     assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ENV
+
+    with pytest.raises(DatabaseNotFoundError):
+        get_xml_path("/path/to/nowhere")
 
 
 def test_default_system():
