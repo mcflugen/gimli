@@ -5,7 +5,9 @@ from typing import Any
 
 import numpy as np
 
+from gimli._constants import STATUS_MESSAGE
 from gimli._system import UnitSystem
+from gimli._udunits2 import UdunitsError
 from gimli._utils import err
 from gimli._utils import out
 from gimli._version import __version__
@@ -57,6 +59,12 @@ def main(argv: tuple[str, ...] | None = None) -> int:
         src_to_dst = args.from_.to(args.to)
     except IncompatibleUnitsError:
         err(f"[error] incompatible units: {args.from_!s}, {args.to!s}")
+        return 1
+    except UdunitsError as error:
+        err(
+            f"[error] udunits internal error (error code {error.code}:"
+            f" {STATUS_MESSAGE.get(error.code, 'unknown')})"
+        )
         return 1
 
     if not args.quiet:
