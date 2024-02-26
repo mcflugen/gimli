@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import contextlib
+from collections import UserDict
 
 from gimli._udunits2 import Unit
 from gimli._udunits2 import _UnitSystem
 
 
-class UnitSystem(_UnitSystem):
+class UnitSystem(UserDict[str, Unit], _UnitSystem):
 
     """A system of units.
 
@@ -29,10 +29,9 @@ class UnitSystem(_UnitSystem):
     """
 
     def __init__(self, filepath: str | None = None):
-        self._registry: dict[str, Unit] = {}
+        self.data: dict[str, Unit] = {}
 
     def __getitem__(self, key: str) -> Unit:
-        with contextlib.suppress(KeyError):
-            return self._registry[key]
-        self._registry[key] = self.Unit(key)
-        return self._registry[key]
+        if key not in self.data:
+            self.data[key] = self.Unit(key)
+        return self.data[key]
