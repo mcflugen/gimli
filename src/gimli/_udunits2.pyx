@@ -210,15 +210,6 @@ cdef class _UnitSystem:
         self._filepath = NULL
         self._status = 0
 
-    def __str__(self):
-        return str(self.database)
-
-    def __repr__(self):
-        return f"UnitSystem({str(self.database)!r})"
-
-    def __eq__(self, other):
-        return os.path.samefile(self.database, other.database)
-
 
 cdef class Unit:
 
