@@ -3,6 +3,8 @@ import os
 import sys
 from collections.abc import Generator
 from functools import partial
+from typing import Any
+from xml.etree import ElementTree
 
 if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
     import importlib.resources as importlib_resources
@@ -67,3 +69,38 @@ def get_xml_path(filepath: str | None = None) -> tuple[str, UnitStatus]:
         raise DatabaseNotFoundError(filepath, status)
 
     return filepath, status
+
+
+def load_database(path: str) -> list[dict[str, Any]]:
+    base = os.path.dirname(path)
+    root = ElementTree.parse(path).getroot()
+
+    units = []
+    for import_path in (child.text for child in root.findall("import")):
+        if isinstance(import_path, str):
+            units += load_database(os.path.join(base, import_path))
+
+    for child in root.findall("unit"):
+        units.append(
+            {
+                "name": {
+                    "singular": child.findtext("name/singular", default=False),
+                    "plural": child.findtext("name/plural", default=False),
+                },
+                "symbol": [symbol.text for symbol in child.findall("symbol")],
+                "base": child.find("base") is not None,
+                "aliases": [
+                    {
+                        "name": {
+                            "singular": alias.findtext("singular"),
+                            "plural": alias.findtext("plural", default=False),
+                        }
+                    }
+                    for alias in child.findall("aliases/name")
+                ]
+                + [{"symbol": alias.text} for alias in child.findall("aliases/symbol")],
+                "def": child.findtext("def", default=False),
+            }
+        )
+
+    return units
