@@ -2,10 +2,7 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import sys
-from enum import Enum
-from enum import Flag
 
 import numpy as np
 
@@ -14,13 +11,13 @@ from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.string cimport strcpy
 
+from gimli._constants import UDUNITS_ENCODING
+from gimli._constants import UnitEncoding
+from gimli._constants import UnitFormatting
+from gimli._constants import UnitStatus
+from gimli._utils import get_xml_path
 from gimli._utils import suppress_stdout
 from gimli.errors import IncompatibleUnitsError
-
-if sys.version_info >= (3, 12):  # pragma: no cover (PY12+)
-    import importlib.resources as importlib_resources
-else:  # pragma: no cover (<PY312)
-    import importlib_resources
 
 DOUBLE = np.double
 FLOAT = np.float32
@@ -29,90 +26,12 @@ ctypedef np.double_t DOUBLE_t
 ctypedef np.float_t FLOAT_t
 
 
-class UnitError(Exception):
+class UdunitsError(Exception):
+    def __init__(self, code):
+        self.code = code
 
-    def __init__(self, code: int, msg: str =""):
-        self._code = code
-        self._msg = msg
-
-    def __str__(self) -> str:
-        msg = self._msg or STATUS_MESSAGE.get(self._code, "Unknown")
-        return "{0} (status {1})".format(msg, self._code)
-
-
-class UnitNameError(UnitError):
-
-    def __init__(self, name: str, code: int):
-        self._name = name
-        self._code = code
-
-    def __str__(self) -> str:
-        return "{0!r}: {1} (status {2})".format(
-            self._name, STATUS_MESSAGE.get(self._code, "Unknown"), self._code
-        )
-
-
-class UnitEncoding(int, Enum):
-    ASCII = 0
-    ISO_8859_1 = 1
-    LATIN1 = 1
-    UTF8 = 2
-
-
-UDUNITS_ENCODING = {
-    "ascii": UnitEncoding.ASCII,
-    "us-ascii": UnitEncoding.ASCII,
-    "iso-8859-1": UnitEncoding.ISO_8859_1,
-    "iso8859-1": UnitEncoding.ISO_8859_1,
-    "latin-1": UnitEncoding.LATIN1,
-    "latin1": UnitEncoding.LATIN1,
-    "utf-8": UnitEncoding.UTF8,
-    "utf8": UnitEncoding.UTF8,
-}
-
-
-class UnitFormatting(int, Flag):
-    NAMES = 4
-    DEFINITIONS = 8
-
-
-class UnitStatus(int, Enum):
-    SUCCESS = 0
-    BAD_ARG = 1
-    EXISTS = 2
-    NO_UNIT = 3
-    OS = 4
-    NOT_SAME_SYSTEM = 5
-    MEANINGLESS = 6
-    NO_SECOND = 7
-    VISIT_ERROR = 8
-    CANT_FORMAT = 9
-    SYNTAX = 10
-    UNKNOWN = 11
-    OPEN_ARG = 12
-    OPEN_ENV = 13
-    OPEN_DEFAULT = 14
-    PARSE = 15
-
-
-STATUS_MESSAGE = {
-    UnitStatus.SUCCESS: "Success",
-    UnitStatus.BAD_ARG:	"An argument violates the function's contract",
-    UnitStatus.EXISTS: "Unit, prefix, or identifier already exists",
-    UnitStatus.NO_UNIT: "No such unit exists",
-    UnitStatus.OS: "Operating-system error.  See 'errno'",
-    UnitStatus.NOT_SAME_SYSTEM: "The units belong to different unit-systems",
-    UnitStatus.MEANINGLESS: "The operation on the unit(s) is meaningless",
-    UnitStatus.NO_SECOND: "The unit-system doesn't have a unit named 'second'",
-    UnitStatus.VISIT_ERROR: "An error occurred while visiting a unit",
-    UnitStatus.CANT_FORMAT: "A unit can't be formatted in the desired manner",
-    UnitStatus.SYNTAX: "string unit representation contains syntax error",
-    UnitStatus.UNKNOWN: "string unit representation contains unknown word",
-    UnitStatus.OPEN_ARG: "Can't open argument-specified unit database",
-    UnitStatus.OPEN_ENV: "Can't open environment-specified unit database",
-    UnitStatus.OPEN_DEFAULT: "Can't open installed, default, unit database",
-    UnitStatus.PARSE: "Error parsing unit specification",
-}
+    def __str__(self):
+        return f"udunits error ({self.code})"
 
 
 cdef extern from "udunits2.h":
@@ -156,39 +75,6 @@ cdef extern from "udunits2.h":
     ut_status ut_get_status()
 
 
-class UnitSystem(_UnitSystem):
-
-    """A system of units.
-
-    A unit-system is a set of units that are all defined in terms of
-    the same set of base units. In the SI system of units, for example,
-    the base units are the meter, kilogram, second, ampere, kelvin,
-    mole, and candela. (For definitions of these base units,
-    see http://physics.nist.gov/cuu/Units/current.html)
-
-    In the UDUNITS-2 package, every accessible unit belongs to one and
-    only one unit-system. It is not possible to convert numeric values
-    between units of different unit-systems. Similarly, units belonging
-    to different unit-systems always compare unequal.
-
-    Parameters
-    ----------
-    filepath : str, optional
-        Path to a *udunits2* xml-formatted unit database. If not provided,
-        a default system of units is used.
-    """
-    def __init__(self, filepath: str | None=None):
-        self._registry = dict()
-
-    def __getitem__(self, key: str) -> Unit:
-        try:
-            return self._registry[key]
-        except KeyError:
-            pass
-        self._registry[key] = self.Unit(key)
-        return self._registry[key]
-
-
 cdef class _UnitSystem:
     cdef ut_system* _unit_system
     cdef ut_status _status
@@ -197,8 +83,8 @@ cdef class _UnitSystem:
     def __cinit__(self, filepath=None):
         cdef char* path
 
-        filepath, self._status = _UnitSystem.get_xml_path(filepath)
-        as_bytes = str(filepath).encode("utf-8")
+        filepath, self._status = get_xml_path(filepath)
+        as_bytes = filepath.encode("utf-8")
 
         self._filepath = <char*>malloc((len(as_bytes) + 1) * sizeof(char))
         strcpy(self._filepath, as_bytes)
@@ -208,40 +94,7 @@ cdef class _UnitSystem:
 
         if self._unit_system == NULL:
             status = ut_get_status()
-            raise UnitError(status)
-
-    @staticmethod
-    def get_xml_path(filepath=None):
-        """Get the path to a unit database.
-
-        Parameters
-        ----------
-        filepath : str, optional
-            The path to an xml-formatted unit database. If not provided, use
-            the value of the *UDUNITS2_XML_PATH* environment variable,
-            otherwise use a default unit database.
-
-        Returns
-        -------
-        str
-            The path to a units database.
-        """
-        if filepath is None:
-            try:
-                filepath = os.environ["UDUNITS2_XML_PATH"]
-            except KeyError:
-                filepath = str(
-                    importlib_resources.files("gimli") / "data/udunits/udunits2.xml"
-                )
-                # filepath = pkg_resources.resource_filename(
-                #     "gimli", "data/udunits/udunits2.xml"
-                # )
-                status = UnitStatus.OPEN_DEFAULT
-            else:
-                status = UnitStatus.OPEN_ENV
-        else:
-            status = UnitStatus.OPEN_ARG
-        return pathlib.Path(filepath), status
+            raise UdunitsError(status)
 
     def dimensionless_unit(self):
         """The dimensionless unit used by the unit system.
@@ -253,7 +106,7 @@ cdef class _UnitSystem:
         """
         cdef ut_unit* unit = ut_get_dimensionless_unit_one(self._unit_system)
         if unit == NULL:
-            raise UnitError(ut_get_status())
+            raise UdunitsError(ut_get_status())
         return Unit.from_ptr(unit, owner=False)
 
     def unit_by_name(self, name):
@@ -318,7 +171,7 @@ cdef class _UnitSystem:
         unit = ut_parse(self._unit_system, name.encode("utf-8"), UnitEncoding.UTF8)
         if unit == NULL:
             status = ut_get_status()
-            raise UnitNameError(name, status)
+            raise UdunitsError(status)
         if ut_is_dimensionless(unit):
             return Unit.from_ptr(unit, owner=False)
         else:
@@ -326,9 +179,9 @@ cdef class _UnitSystem:
 
 
     @property
-    def database(self):
+    def database(self) -> str:
         """Path to the unit-database being used."""
-        return pathlib.Path(self._filepath.decode())
+        return self._filepath.decode()
 
     @property
     def status(self):
@@ -356,15 +209,6 @@ cdef class _UnitSystem:
         self._unit_system = NULL
         self._filepath = NULL
         self._status = 0
-
-    def __str__(self):
-        return str(self.database)
-
-    def __repr__(self):
-        return "UnitSystem({0!r})".format(str(self.database))
-
-    def __eq__(self, other):
-        return self.database.samefile(other.database)
 
 
 cdef class Unit:
@@ -402,11 +246,13 @@ cdef class Unit:
         return self.UnitConverter(unit)
 
     cpdef UnitConverter(self, Unit unit):
-        converter = ut_get_converter(self._unit, unit._unit)
+        with suppress_stdout():
+            converter = ut_get_converter(self._unit, unit._unit)
 
         if converter == NULL:
             status = ut_get_status()
-            raise IncompatibleUnitsError(str(self), str(unit))
+            raise UdunitsError(status)
+            # raise IncompatibleUnitsError(str(self), str(unit))
 
         return UnitConverter.from_ptr(converter, owner=True)
 
@@ -487,7 +333,7 @@ cdef class Unit:
              if status == UnitStatus.SUCCESS:
                  return None
              else:
-                 raise UnitError(status)
+                 raise UdunitsError(status)
         else:
             return name.decode()
 
@@ -506,7 +352,7 @@ cdef class Unit:
              if status == UnitStatus.SUCCESS:
                  return None
              else:
-                 raise UnitError(status)
+                 raise UdunitsError(status)
         else:
             return symbol.decode()
 
@@ -527,7 +373,7 @@ cdef class Unit:
             if status == UnitStatus.SUCCESS:
                 return False
             else:
-                raise UnitError(status)
+                raise UdunitsError(status)
 
 
     cpdef is_convertible_to(self, Unit unit):

@@ -20,18 +20,8 @@
 
 An object-oriented Python interface to [udunits2][udunits-link] built with cython.
 
-## Requirements
-
-*udunits2* is the unit conversion C library that
-*gimli* wraps using *cython*. The easiest way to install *udunits2* is
-through Anaconda (see the Install section), or *yum* (as *udunits2-devel*
-on ubuntu-based Linux). It can, however, also be compiled and installed from source.
-You can get the source code either as a [.tar.gz][udunits-download] or from
-[GitHub][udunits-github].
-
-All other requirements are available using either *pip* or *conda*. To
-see a full listing of the requirements, have a look at the project's
-*requirements.in* file.
+**NOTE: *gimli.units* includes a vendored version of *udunits2* so that you do not
+have to install the *udunits2* library separately.**
 
 ## Installation
 
@@ -72,24 +62,24 @@ the *udunits2* library. *gimli*, however, also comes with a
 You primarily will access *gimli* through *gimli.units*,
 
 ```python
->>> from gimli import units
+>>> from gimli.units import units
 ```
 
 *units* is an instance of the default *UnitSystem* class, which contains
 all of the units contained in a given unit system. If you like, you can create
 your own unit system but, typically, the default should be fine.
 
-To get a specific unit from the system, do so by passing a unit
-string to the *Units* class. For example,
+*units* is a *dict*-like object whose keys are strings representing units
+and values are instances of those units. For example,
 
 ```python
->>> units.Unit("m")
+>>> units["m"]
 Unit('meter')
->>> units.Unit("m/s")
+>>> units["m/s"]
 Unit('meter-second^-1')
->>> units.Unit("kg m-3")
+>>> units["kg m-3"]
 Unit('meter^-3-kilogram')
->>> units.Unit("N m")
+>>> units["N m"]
 Unit('joule')
 ```
 
@@ -97,8 +87,8 @@ Every *Unit* instance has a *to* method, which returns a unit converter
 for converting values from one unit to another,
 
 ```python
->>> lbs = units.Unit("lb")
->>> kgs = units.Unit("kg")
+>>> lbs = units["lb"]
+>>> kgs = units["kg"]
 >>> kgs_to_lbs = kgs.to(lbs)
 >>> kgs_to_lbs(1.0)
 2.2046226218487757
@@ -107,8 +97,8 @@ for converting values from one unit to another,
 You can also construct units that are a combination of other units.
 
 ```python
->>> ft_per_s = units.Unit("ft / s")
->>> m_per_s = units.Unit("m s-1")
+>>> ft_per_s = units["ft / s"]
+>>> m_per_s = units["m s-1"]
 >>> ft_per_s.to(m_per_s)([1.0, 2.0])
 array([0.3048, 0.6096])
 ```

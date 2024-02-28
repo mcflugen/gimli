@@ -9,10 +9,11 @@ from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal
 
 import gimli
-from gimli import UnitFormatting
-from gimli import UnitNameError
-from gimli import UnitStatus
-from gimli import UnitSystem
+from gimli._constants import UnitFormatting
+from gimli._constants import UnitStatus
+from gimli._system import UnitSystem
+from gimli._utils import get_xml_path
+from gimli.errors import DatabaseNotFoundError
 
 
 @pytest.fixture(scope="module")
@@ -23,44 +24,47 @@ def system():
 
 def test_get_xml():
     os.environ.pop("UDUNITS2_XML_PATH", None)
-    path, status = UnitSystem.get_xml_path()
-    assert path.is_file()
+    path, status = get_xml_path()
+    assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_DEFAULT
 
-    path, status = UnitSystem.get_xml_path(path)
-    assert path.is_file()
+    path, status = get_xml_path(path)
+    assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ARG
 
     os.environ["UDUNITS2_XML_PATH"] = str(path)
-    path, status = UnitSystem.get_xml_path()
-    assert path.is_file()
+    path, status = get_xml_path()
+    assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ENV
+
+    with pytest.raises(DatabaseNotFoundError):
+        get_xml_path("/path/to/nowhere")
 
 
 def test_default_system():
     os.environ.pop("UDUNITS2_XML_PATH", None)
     system = UnitSystem()
     assert system.status == "default"
-    assert system.database.is_file()
+    assert os.path.isfile(system.database)
 
 
 def test_user_system():
     path = UnitSystem().database
     system = UnitSystem(path)
     assert system.status == "user"
-    assert system.database.is_file()
+    assert os.path.isfile(system.database)
     assert system == UnitSystem()
     assert UnitSystem(path) == UnitSystem(str(path))
 
 
 def test_env_system(system):
-    os.environ["UDUNITS2_XML_PATH"] = str(system.database)
+    os.environ["UDUNITS2_XML_PATH"] = system.database
     env_system = UnitSystem()
 
     assert env_system.status == "env"
-    assert env_system.database.is_file()
+    assert os.path.isfile(env_system.database)
     assert str(env_system) == str(system)
-    assert env_system.database.samefile(system.database)
+    assert os.path.samefile(system.database, env_system.database)
     assert env_system == system
 
 
@@ -219,13 +223,14 @@ def test_unit_converter_same_units(system):
     [("not_a_unit", "m"), ("m", "not_a_unit"), ("not_a_unit", "not_a_unit")],
 )
 def test_unit_converter_bad_from_units(system, to_, from_):
-    with pytest.raises(UnitNameError):
-        system.Unit(from_).to(system.Unit(to_))
+    with pytest.raises(gimli._udunits2.UdunitsError):
+        system[from_].to(system[to_])
+        # system.Unit(from_).to(system.Unit(to_))
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_unit_converter_incompatible_units(system):
-    with pytest.raises(gimli.errors.IncompatibleUnitsError):
+    with pytest.raises(gimli._udunits2.UdunitsError):
         system.Unit("s").to(system.Unit("m"))
 
 

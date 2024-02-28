@@ -8,7 +8,7 @@ from setuptools import setup
 udunits2_prefix = os.environ.get("WITH_UDUNITS2", sys.prefix)
 if sys.platform.startswith("win") and "WITH_UDUNITS" not in os.environ:
     udunits2_prefix = os.path.join(sys.prefix, "Library")
-vendored_prefix = os.path.join(os.path.dirname(__file__), "_inst")
+vendored_prefix = os.path.join(os.path.dirname(__file__), "dist", "extern")
 
 setup(
     include_package_data=True,
