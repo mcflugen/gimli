@@ -2,7 +2,9 @@
 
 ## 0.3.3 (2024-10-04)
 
-- Nothing changed yet.
+- Added support for Python 3.13.
+- Included vendored versions of both *ununits2* and *expat* so that users don't
+  have to install either of those packages separately.
 
 ## 0.3.0 (2021-11-16)
 
