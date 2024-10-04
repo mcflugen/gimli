@@ -102,7 +102,7 @@ test-requires = [
     "hypothesis",
     "pytest",
 ]
-# test-command = "pytest {package}/tests"
+test-command = "pytest {package}/tests"
 overrides = [
 	{ select = "*-musllinux*", before-all = "apk add flex libtool texinfo" },
 ]
