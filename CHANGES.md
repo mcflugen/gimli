@@ -1,6 +1,6 @@
 # Changelog for gimli
 
-## 0.3.1 (unreleased)
+## 0.3.3 (2024-10-04)
 
 - Nothing changed yet.
 
