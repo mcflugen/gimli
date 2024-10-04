@@ -187,7 +187,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     outputs:
-      publish: ${{ steps.check-prerelease.outputs.publish_url }}
+      publish_url: ${{ steps.check-publish.outputs.publish_url }}
 
     steps:
     - name: Check if this is a release/prerelease
@@ -195,12 +195,15 @@ jobs:
       run: |
         tag_name="${GITHUB_REF#refs/tags/}"
         if [[ "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[ab][0-9]+$ ]]; then
-          echo "publish_url=https://test.pypi.org/legacy/" >> "$GITHUB_OUTPUT"
+          publish_url="https://test.pypi.org/legacy/"
         elif [[ "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "publish_url=https://pypi.org/" >> "$GITHUB_OUTPUT"
+          publish_url="https://pypi.org/"
         else
-          echo "publish_url=none" >> "$GITHUB_OUTPUT"
+          publish_url="none"
         fi
+        echo "publish_url=$publish_url" >> "$GITHUB_OUTPUT"
+        echo "tag_name=$tag_name"
+        echo "publish_url=$publish_url"
 
   publish:
     needs: "check_tag"
@@ -217,7 +220,7 @@ jobs:
           merge-multiple: true
           path: ${{ github.workspace }}/dist
       - uses: pypa/gh-action-pypi-publish@release/v1
-        if: "${{ needs.check_tag.outputs.publish_url != 'none' }}"
+        if: ${{ startsWith(needs.check_tag.outputs.publish_url, 'http') }}
         with:
           repository-url: ${{ needs.check_tag.outputs.publish_url }}
           skip-existing: true
