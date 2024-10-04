@@ -1,5 +1,9 @@
 # Changelog for gimli
 
+## 0.3.4 (unreleased)
+
+- Nothing changed yet.
+
 ## 0.3.3 (2024-10-04)
 
 - Added support for Python 3.13.
