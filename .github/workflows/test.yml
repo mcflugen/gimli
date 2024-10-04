@@ -206,7 +206,7 @@ jobs:
         if [[ "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[ab][0-9]+$ ]]; then
           publish_url="https://test.pypi.org/legacy/"
         elif [[ "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          publish_url="https://pypi.org/"
+          publish_url="https://upload.pypi.org/legacy/"
         else
           publish_url="none"
         fi
