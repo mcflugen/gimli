@@ -182,3 +182,42 @@ jobs:
         with:
           parallel-finished: true
           debug: true
+
+  check_tag:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.check-prerelease.outputs.is_prerelease }}
+
+    steps:
+    - name: Check if this is a prerelease
+      id: check-prerelease
+      run: |
+        tag_name="${GITHUB_REF#refs/tags/}"
+        if [[ "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[ab][0-9]+$ ]]; then
+          echo "is_prerelease=1" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_prerelease=0" >> "$GITHUB_OUTPUT"
+        fi
+
+  publish-to-test-pypi:
+    needs: "check_tag"
+    name: "Publish to TestPyPI"
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "wheel-*"
+          merge-multiple: true
+          path: ${{ github.workspace }}/dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        if: "${{ needs.check_tag.outputs.publish == '1' }}"
+        with:
+          repository_url: 'https://test.pypi.org/legacy/'
+          skip_existing: true
+          print_hash: true
+          verify_metadata: false
