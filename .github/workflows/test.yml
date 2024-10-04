@@ -49,11 +49,11 @@ jobs:
 
           # Mac x86_64
           - cibw-only: "cp310-macosx_x86_64"
-            os: "macos-latest"
+            os: "macos-13"
           - cibw-only: "cp311-macosx_x86_64"
-            os: "macos-latest"
+            os: "macos-13"
           - cibw-only: "cp312-macosx_x86_64"
-            os: "macos-latest"
+            os: "macos-13"
 
           # Mac arm64
           - cibw-only: "cp310-macosx_arm64"
@@ -93,7 +93,7 @@ jobs:
         with:
           platforms: all
 
-      - name: Print build identifiers
+      - name: Build wheels
         run: |
           python -m pip install cibuildwheel
           python -m cibuildwheel --only ${{ matrix.cibw-only }} --print-build-identifiers
