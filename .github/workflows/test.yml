@@ -163,7 +163,7 @@ jobs:
           nox -s test \
               --verbose \
               --force-pythons=${{ matrix.python-version }} \
-              -- ${{ github.workspace }}/dist
+              -- dist
 
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest'
@@ -171,7 +171,6 @@ jobs:
         with:
           parallel: true
           flag-name: py${{ matrix.python-version }}-${{ matrix.os }}
-
           debug: true
 
   coveralls_finish:
