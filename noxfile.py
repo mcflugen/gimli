@@ -11,13 +11,28 @@ ROOT = pathlib.Path(__file__).parent
 PYTHON_VERSION = "3.12"
 
 
-@nox.session(python=PYTHON_VERSION, venv_backend="conda")
+@nox.session(python=PYTHON_VERSION)
 def test(session: nox.Session) -> None:
     """Run the tests."""
-    session.conda_install("udunits2", channel=["nodefaults", "conda-forge"])
-    session.install(".[testing]")
+    arg = session.posargs[0] if session.posargs else None
+    if arg and os.path.isdir(arg):
+        session.install(
+            "gimli.units",
+            f"--find-links={arg}",
+            "--no-deps",
+            "--no-index",
+        )
+    elif arg and os.path.isfile(arg):
+        session.install(arg, "--no-deps")
+    else:
+        session.install(".", "--no-deps")
 
-    args = ["--cov", PROJECT, "-vvv"] + session.posargs
+    session.install(
+        *("-r", "requirements.in"),
+        *("-r", "requirements-testing.in"),
+    )
+
+    args = ["--cov", "gimli.units", "-vvv"]
 
     if "CI" in os.environ:
         args.append(f"--cov-report=xml:{ROOT.absolute()!s}/coverage.xml")

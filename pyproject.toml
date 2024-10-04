@@ -102,7 +102,7 @@ test-requires = [
     "hypothesis",
     "pytest",
 ]
-test-command = "pytest {package}/tests"
+# test-command = "pytest {package}/tests"
 overrides = [
 	{ select = "*-musllinux*", before-all = "apk add flex libtool texinfo" },
 ]
@@ -111,6 +111,14 @@ overrides = [
 before-all = "yum install -y flex libtool texinfo"
 
 [tool.cibuildwheel.macos]
+before-build = [
+    "cd extern/udunits-2.2.28",
+    "mkdir -p m4",
+    "autoreconf -fvi",
+    "./configure --disable-static --enable-shared --prefix=/usr/local",
+    "make",
+    "sudo make install",
+]
 before-all = "brew install automake libtool texinfo"
 
 [tool.cibuildwheel.windows]

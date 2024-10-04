@@ -3,13 +3,138 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  build-and-test:
-    # We want to run on external PRs, but not on our own internal PRs as they'll be run
-    # by the push to the branch. Without this if check, checks are duplicated since
-    # internal PRs match both the push and pull_request events.
+  build-wheels:
+    # Run on external PRs, but not on internal PRs, to avoid duplicate runs
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
       github.repository
+
+    name: Build wheels on ${{ matrix.cibw-only }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64
+          - cibw-only: "cp310-manylinux_x86_64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp311-manylinux_x86_64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp312-manylinux_x86_64"
+            os: "ubuntu-latest"
+
+          # Linux aarch64
+          - cibw-only: "cp310-manylinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp311-manylinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp312-manylinux_aarch64"
+            os: "ubuntu-latest"
+
+          # musllinux x86_64
+          - cibw-only: "cp310-musllinux_x86_64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp311-musllinux_x86_64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp312-musllinux_x86_64"
+            os: "ubuntu-latest"
+
+          # musllinux aarch64
+          - cibw-only: "cp310-musllinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp311-musllinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp312-musllinux_aarch64"
+            os: "ubuntu-latest"
+
+          # Mac x86_64
+          - cibw-only: "cp310-macosx_x86_64"
+            os: "macos-latest"
+          - cibw-only: "cp311-macosx_x86_64"
+            os: "macos-latest"
+          - cibw-only: "cp312-macosx_x86_64"
+            os: "macos-latest"
+
+          # Mac arm64
+          - cibw-only: "cp310-macosx_arm64"
+            os: "macos-latest"
+          - cibw-only: "cp311-macosx_arm64"
+            os: "macos-latest"
+          - cibw-only: "cp312-macosx_arm64"
+            os: "macos-latest"
+
+          # Windows 64bit
+          - cibw-only: "cp310-win_amd64"
+            os: "windows-latest"
+          - cibw-only: "cp311-win_amd64"
+            os: "windows-latest"
+          - cibw-only: "cp312-win_amd64"
+            os: "windows-latest"
+
+          # Windows 32
+          # - cibw-only: "cp310-win32"
+          #   os: "windows-latest"
+          # - cibw-only: "cp311-win32"
+          #   os: "windows-latest"
+          # - cibw-only: "cp312-win32"
+          #   os: "windows-latest"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Set up QEMU  # Needed to build aarch64 wheels
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Print build identifiers
+        run: |
+          python -m pip install cibuildwheel
+          python -m cibuildwheel --only ${{ matrix.cibw-only }} --print-build-identifiers
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2.0.2
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.2
+        with:
+          only: ${{ matrix.cibw-only }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}-${{ matrix.cibw-only }}
+          path: ./wheelhouse/*.whl
+
+  show-artifacts:
+    needs: "build-wheels"
+    name: "Show artifacts"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: "wheel-*"
+        merge-multiple: true
+        path: ${{ github.workspace }}/dist
+
+    - shell: bash
+      run: |
+        ls -l ${{ github.workspace }}/dist
+
+  test:
+    needs: build-wheels
+    name: Run the tests
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
 
     runs-on: ${{ matrix.os }}
 
@@ -17,24 +142,28 @@ jobs:
       run:
         shell: bash -l {0}
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12"]
-      fail-fast: false
-
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
-          miniforge-variant: Mambaforge
+          miniforge-variant: Miniforge3
           miniforge-version: latest
+          auto-update-conda: true
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "wheel-*"
+          merge-multiple: true
+          path: ${{ github.workspace }}/dist
 
       - name: Test
         run: |
           pip install nox
-          nox -s test --force-pythons="${{ matrix.python-version }}"
+          nox -s test \
+              --verbose \
+              --force-pythons=${{ matrix.python-version }} \
+              -- dist
 
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest'
@@ -42,11 +171,10 @@ jobs:
         with:
           parallel: true
           flag-name: py${{ matrix.python-version }}-${{ matrix.os }}
-
           debug: true
 
   coveralls_finish:
-    needs: build-and-test
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
