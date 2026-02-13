@@ -24,6 +24,8 @@ jobs:
             os: "ubuntu-latest"
           - cibw-only: "cp313-manylinux_x86_64"
             os: "ubuntu-latest"
+          - cibw-only: "cp314-manylinux_x86_64"
+            os: "ubuntu-latest"
 
           # Linux aarch64
           - cibw-only: "cp310-manylinux_aarch64"
@@ -33,6 +35,8 @@ jobs:
           - cibw-only: "cp312-manylinux_aarch64"
             os: "ubuntu-latest"
           - cibw-only: "cp313-manylinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp314-manylinux_aarch64"
             os: "ubuntu-latest"
 
           # musllinux x86_64
@@ -44,6 +48,8 @@ jobs:
             os: "ubuntu-latest"
           - cibw-only: "cp313-musllinux_x86_64"
             os: "ubuntu-latest"
+          - cibw-only: "cp314-musllinux_x86_64"
+            os: "ubuntu-latest"
 
           # musllinux aarch64
           - cibw-only: "cp310-musllinux_aarch64"
@@ -53,6 +59,8 @@ jobs:
           - cibw-only: "cp312-musllinux_aarch64"
             os: "ubuntu-latest"
           - cibw-only: "cp313-musllinux_aarch64"
+            os: "ubuntu-latest"
+          - cibw-only: "cp314-musllinux_aarch64"
             os: "ubuntu-latest"
 
           # Mac x86_64
@@ -64,6 +72,8 @@ jobs:
             os: "macos-13"
           - cibw-only: "cp313-macosx_x86_64"
             os: "macos-13"
+          - cibw-only: "cp314-macosx_x86_64"
+            os: "macos-13"
 
           # Mac arm64
           - cibw-only: "cp310-macosx_arm64"
@@ -74,6 +84,8 @@ jobs:
             os: "macos-latest"
           - cibw-only: "cp313-macosx_arm64"
             os: "macos-latest"
+          - cibw-only: "cp314-macosx_arm64"
+            os: "macos-latest"
 
           # Windows 64bit
           - cibw-only: "cp310-win_amd64"
@@ -83,6 +95,8 @@ jobs:
           - cibw-only: "cp312-win_amd64"
             os: "windows-latest"
           - cibw-only: "cp313-win_amd64"
+            os: "windows-latest"
+          - cibw-only: "cp314-win_amd64"
             os: "windows-latest"
 
           # Windows 32
