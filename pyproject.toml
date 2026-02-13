@@ -103,9 +103,6 @@ test-requires = [
     "pytest",
 ]
 test-command = "pytest {package}/tests"
-overrides = [
-	{ select = "*-musllinux*", before-all = "apk add flex libtool texinfo" },
-]
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y flex libtool texinfo"
