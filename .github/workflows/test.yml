@@ -15,97 +15,31 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Linux x86_64
-          - cibw-only: "cp310-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp314-manylinux_x86_64"
-            os: "ubuntu-latest"
-
-          # Linux aarch64
-          - cibw-only: "cp310-manylinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-manylinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-manylinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-manylinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp314-manylinux_aarch64"
-            os: "ubuntu-latest"
-
-          # musllinux x86_64
-          - cibw-only: "cp310-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp314-musllinux_x86_64"
-            os: "ubuntu-latest"
-
-          # musllinux aarch64
-          - cibw-only: "cp310-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp314-musllinux_aarch64"
-            os: "ubuntu-latest"
-
-          # Mac x86_64
-          - cibw-only: "cp310-macosx_x86_64"
-            os: "macos-13"
-          - cibw-only: "cp311-macosx_x86_64"
-            os: "macos-13"
-          - cibw-only: "cp312-macosx_x86_64"
-            os: "macos-13"
-          - cibw-only: "cp313-macosx_x86_64"
-            os: "macos-13"
-          - cibw-only: "cp314-macosx_x86_64"
-            os: "macos-13"
-
-          # Mac arm64
-          - cibw-only: "cp310-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp311-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp312-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp313-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp314-macosx_arm64"
-            os: "macos-latest"
-
-          # Windows 64bit
-          - cibw-only: "cp310-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp311-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp312-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp313-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp314-win_amd64"
-            os: "windows-latest"
-
-          # Windows 32
-          # - cibw-only: "cp310-win32"
-          #   os: "windows-latest"
-          # - cibw-only: "cp311-win32"
-          #   os: "windows-latest"
-          # - cibw-only: "cp312-win32"
-          #   os: "windows-latest"
+          - { os: macos-latest, cibw-only: cp310-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-latest, cibw-only: cp311-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-latest, cibw-only: cp312-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-latest, cibw-only: cp313-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-latest, cibw-only: cp314-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-latest, cibw-only: cp310-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp311-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp312-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp313-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp314-macosx_arm64, mac_deployment: "11.0" }
+          - { os: ubuntu-latest, cibw-only: cp310-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp311-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp312-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp313-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp314-manylinux_x86_64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp310-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp311-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp312-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp313-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp314-manylinux_aarch64 }
+          - { os: windows-2022, cibw-only: cp310-win_amd64 }
+          - { os: windows-2022, cibw-only: cp311-win_amd64 }
+          - { os: windows-2022, cibw-only: cp312-win_amd64 }
+          - { os: windows-2022, cibw-only: cp313-win_amd64 }
+          - { os: windows-2022, cibw-only: cp314-win_amd64 }
 
     steps:
       - uses: actions/checkout@v6
@@ -125,6 +59,9 @@ jobs:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.3
+        env:
+          CIBW_ENVIRONMENT_MACOS: >-
+            MACOSX_DEPLOYMENT_TARGET=${{ matrix.mac_deployment }}
         with:
           only: ${{ matrix.cibw-only }}
 
@@ -155,8 +92,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.14"]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     runs-on: ${{ matrix.os }}
 
