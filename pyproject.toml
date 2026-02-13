@@ -107,6 +107,11 @@ test-command = "pytest {package}/tests"
 [tool.cibuildwheel.linux]
 before-all = "yum install -y flex libtool texinfo"
 
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "12.0"
+CC = "clang"
+CXX = "clang++"
+
 [tool.cibuildwheel.macos]
 before-build = [
     "cd extern/udunits-2.2.28",
