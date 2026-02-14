@@ -114,6 +114,16 @@ jobs:
           merge-multiple: true
           path: ${{ github.workspace }}/dist
 
+      - name: Inspect built wheel
+        if: runner.os == 'macOS'
+        run: |
+          cd dist
+          unzip *.whl -d unpacked
+          cd unpacked
+          find . -name "*.so"
+          otool -L gimli/*.so
+          nm -u gimli/*.so | grep cv_convert || true
+
       - name: Test
         run: |
           pip install nox
