@@ -124,26 +124,43 @@ before-build = [
 before-all = "brew install automake libtool texinfo"
 test-command = """
 pytest {project}/tests || (
-  echo "===== pytest failed, inspecting extension =====" &&
+  echo "===== pytest failed; inspecting built extension without importing =====" &&
   python - <<'PY'
-import sys
-import importlib
+from __future__ import annotations
+
+import glob
 import os
+import pathlib
+import sys
 
-try:
-    import gimli._udunits2 as m
-except Exception as e:
-    print("Import failed:", e)
-    raise
+site = next(p for p in sys.path if p.endswith("site-packages"))
+print("site-packages:", site)
 
-so = m.__file__
+# Find the extension by filename pattern (adjust if your module name differs)
+candidates = sorted(glob.glob(os.path.join(site, "gimli", "_udunits2*.so")))
+print("Candidates:", candidates)
+
+if not candidates:
+    raise SystemExit("No extension .so found under site-packages/gimli")
+
+so = candidates[0]
 print("Extension path:", so)
 
-print("\\n--- otool -L ---")
-os.system(f"otool -L {so}")
+print("\\n--- otool -L (extension deps) ---")
+os.system(f"otool -L {so} || true")
 
-print("\\n--- unresolved symbols ---")
-os.system(f"nm -u {so} | grep cv_convert || true")
+print("\\n--- undefined symbols in extension (look for cv_*) ---")
+os.system(f"nm -u {so} | egrep 'cv_convert|udunits|ut_|cv_' || true")
+
+print("\\n--- dyld load trace (attempt import, expected to fail) ---")
+os.system("DYLD_PRINT_LIBRARIES=1 python -c 'import gimli._udunits2' || true")
+
+# If a vendored udunits dylib was bundled anywhere in site-packages, inspect it too:
+dylibs = sorted(glob.glob(os.path.join(site, "**", "libudunits2*.dylib"), recursive=True))
+print("\\nBundled libudunits2 dylibs found:", dylibs)
+for dylib in dylibs:
+    print("\\n--- nm -gU on", dylib, "---")
+    os.system(f"nm -gU {dylib} | grep cv_convert_double || true")
 PY
   exit 1
 )
