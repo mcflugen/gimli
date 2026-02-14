@@ -122,6 +122,32 @@ before-build = [
     "sudo make install",
 ]
 before-all = "brew install automake libtool texinfo"
+test-command = """
+pytest {project}/tests || (
+  echo "===== pytest failed, inspecting extension =====" &&
+  python - <<'PY'
+import sys
+import importlib
+import os
+
+try:
+    import gimli._udunits2 as m
+except Exception as e:
+    print("Import failed:", e)
+    raise
+
+so = m.__file__
+print("Extension path:", so)
+
+print("\\n--- otool -L ---")
+os.system(f"otool -L {so}")
+
+print("\\n--- unresolved symbols ---")
+os.system(f"nm -u {so} | grep cv_convert || true")
+PY
+  exit 1
+)
+"""
 
 [tool.cibuildwheel.windows]
 before-build = "pip install delvewheel"
