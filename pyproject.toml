@@ -88,8 +88,13 @@ where = [
 
 [tool.cibuildwheel]
 build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
-skip = "*-win32*"
-archs = "x86_64,aarch64,arm64,AMD64,x86"
+skip = "*-win32* *-manylinux_i686* *-musllinux_i686*"
+test-requires = ["hypothesis", "pytest"]
+test-command = "pytest {package}/tests"
+
+[tool.cibuildwheel.linux]
+archs = "x86_64,aarch64"
+before-all = "yum install -y flex libtool texinfo"
 before-build = """
 bash -c 'set -eux
 PREFIX="$(pwd -P)/dist/extern"
@@ -102,17 +107,14 @@ autoreconf -fvi
 ./configure --disable-static --enable-shared --prefix="$PREFIX"
 make -j2
 make install
+
+# Ensure SONAME symlink exists for auditwheel
+ls -l "$PREFIX/lib" | grep udunits || true
+if [ -f "$PREFIX/lib/libudunits2.so.0.0.0" ] && [ ! -e "$PREFIX/lib/libudunits2.so.0" ]; then
+  ln -s "libudunits2.so.0.0.0" "$PREFIX/lib/libudunits2.so.0"
+fi
 '
 """
-test-requires = [
-    "hypothesis",
-    "pytest",
-]
-test-command = "pytest {package}/tests"
-
-[tool.cibuildwheel.linux]
-before-all = "yum install -y flex libtool texinfo"
-[tool.cibuildwheel.linux.environment]
 environment = """
 UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
 CPPFLAGS="-I$UDUNITS2_PREFIX/include"
@@ -122,20 +124,9 @@ PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
 LD_LIBRARY_PATH="$UDUNITS2_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 """
 
-# [tool.cibuildwheel.macos.environment]
-# WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
-# MACOSX_DEPLOYMENT_TARGET = "10.9"
-# CC = "clang"
-# CXX = "clang++"
-
 [tool.cibuildwheel.macos]
-environment = """
-UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
-CPPFLAGS="-I$UDUNITS2_PREFIX/include"
-CFLAGS="-I$UDUNITS2_PREFIX/include"
-LDFLAGS="-L$UDUNITS2_PREFIX/lib"
-PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
-"""
+archs = "x86_64,arm64"
+before-all = "brew install autoconf automake libtool texinfo"
 before-build = """
 bash -c 'set -eux
 PREFIX="$(pwd -P)/dist/extern"
@@ -150,49 +141,12 @@ make -j2
 make install
 '
 """
-before-all = "brew install automake libtool texinfo"
-test-command = """
-pytest {project}/tests || (
-  echo "===== pytest failed; inspecting built extension without importing =====" &&
-  python - <<'PY'
-from __future__ import annotations
-
-import glob
-import os
-import pathlib
-import sys
-
-site = next(p for p in sys.path if p.endswith("site-packages"))
-print("site-packages:", site)
-
-# Find the extension by filename pattern (adjust if your module name differs)
-candidates = sorted(glob.glob(os.path.join(site, "gimli", "_udunits2*.so")))
-print("Candidates:", candidates)
-
-if not candidates:
-    raise SystemExit("No extension .so found under site-packages/gimli")
-
-so = candidates[0]
-print("Extension path:", so)
-
-print("\\n--- otool -L (extension deps) ---")
-os.system(f"otool -L {so} || true")
-
-print("\\n--- undefined symbols in extension (look for cv_*) ---")
-os.system(f"nm -u {so} | egrep 'cv_convert|udunits|ut_|cv_' || true")
-
-print("\\n--- dyld load trace (attempt import, expected to fail) ---")
-os.system("DYLD_PRINT_LIBRARIES=1 python -c 'import gimli._udunits2' || true")
-
-# If a vendored udunits dylib was bundled anywhere in site-packages, inspect it too:
-dylibs = sorted(glob.glob(os.path.join(site, "**", "libudunits2*.dylib"), recursive=True))
-print("\\nBundled libudunits2 dylibs found:", dylibs)
-for dylib in dylibs:
-    print("\\n--- nm -gU on", dylib, "---")
-    os.system(f"nm -gU {dylib} | grep cv_convert_double || true")
-PY
-  exit 1
-)
+environment = """
+UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
+CPPFLAGS="-I$UDUNITS2_PREFIX/include"
+CFLAGS="-I$UDUNITS2_PREFIX/include"
+LDFLAGS="-L$UDUNITS2_PREFIX/lib"
+PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
 """
 
 [tool.cibuildwheel.windows]
