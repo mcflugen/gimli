@@ -15,11 +15,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-latest, cibw-only: cp310-macosx_x86_64, mac_deployment: "10.9" }
-          - { os: macos-latest, cibw-only: cp311-macosx_x86_64, mac_deployment: "10.9" }
-          - { os: macos-latest, cibw-only: cp312-macosx_x86_64, mac_deployment: "10.9" }
-          - { os: macos-latest, cibw-only: cp313-macosx_x86_64, mac_deployment: "10.9" }
-          - { os: macos-latest, cibw-only: cp314-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp310-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp311-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp312-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp313-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp314-macosx_x86_64, mac_deployment: "10.9" }
           - { os: macos-latest, cibw-only: cp310-macosx_arm64, mac_deployment: "11.0" }
           - { os: macos-latest, cibw-only: cp311-macosx_arm64, mac_deployment: "11.0" }
           - { os: macos-latest, cibw-only: cp312-macosx_arm64, mac_deployment: "11.0" }
