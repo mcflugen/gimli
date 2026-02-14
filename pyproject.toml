@@ -92,12 +92,17 @@ skip = "*-win32* *-manylinux_i686* *-musllinux_i686*"
 test-requires = ["hypothesis", "pytest"]
 test-command = "pytest {package}/tests"
 
-[tool.cibuildwheel.linux]
-archs = "x86_64,aarch64"
-before-all = "yum install -y flex libtool texinfo"
+environment = """
+UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
+CPPFLAGS="-I$UDUNITS2_PREFIX/include"
+CFLAGS="-I$UDUNITS2_PREFIX/include"
+LDFLAGS="-L$UDUNITS2_PREFIX/lib"
+PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
+"""
+
 before-build = """
-bash -c 'set -eux
-PREFIX="$(pwd -P)/dist/extern"
+bash -lc 'set -eux
+PREFIX="$UDUNITS2_PREFIX"
 rm -rf "$PREFIX"
 mkdir -p "$PREFIX"
 
@@ -107,47 +112,16 @@ autoreconf -fvi
 ./configure --disable-static --enable-shared --prefix="$PREFIX"
 make -j2
 make install
-
-# Ensure SONAME symlink exists for auditwheel
-ls -l "$PREFIX/lib" | grep udunits || true
-if [ -f "$PREFIX/lib/libudunits2.so.0.0.0" ] && [ ! -e "$PREFIX/lib/libudunits2.so.0" ]; then
-  ln -s "libudunits2.so.0.0.0" "$PREFIX/lib/libudunits2.so.0"
-fi
 '
 """
-environment = """
-UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
-CPPFLAGS="-I$UDUNITS2_PREFIX/include"
-CFLAGS="-I$UDUNITS2_PREFIX/include"
-LDFLAGS="-L$UDUNITS2_PREFIX/lib"
-PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
-LD_LIBRARY_PATH="$UDUNITS2_PREFIX/lib:${LD_LIBRARY_PATH:-}"
-"""
+
+[tool.cibuildwheel.linux]
+archs = "x86_64,aarch64"
+before-all = "yum install -y flex libtool texinfo"
 
 [tool.cibuildwheel.macos]
 archs = "x86_64,arm64"
 before-all = "brew install autoconf automake libtool texinfo"
-before-build = """
-bash -c 'set -eux
-PREFIX="$(pwd -P)/dist/extern"
-rm -rf "$PREFIX"
-mkdir -p "$PREFIX"
-
-cd extern/udunits-2.2.28
-mkdir -p m4
-autoreconf -fvi
-./configure --disable-static --enable-shared --prefix="$PREFIX"
-make -j2
-make install
-'
-"""
-environment = """
-UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
-CPPFLAGS="-I$UDUNITS2_PREFIX/include"
-CFLAGS="-I$UDUNITS2_PREFIX/include"
-LDFLAGS="-L$UDUNITS2_PREFIX/lib"
-PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
-"""
 
 [tool.cibuildwheel.windows]
 before-build = "pip install delvewheel"
