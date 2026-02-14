@@ -5,8 +5,8 @@ import numpy
 from setuptools import Extension
 from setuptools import setup
 
-udunits2_prefix = os.environ.get("WITH_UDUNITS2", sys.prefix)
-if sys.platform.startswith("win") and "WITH_UDUNITS" not in os.environ:
+udunits2_prefix = os.environ.get("UDUNITS2_PREFIX", sys.prefix)
+if sys.platform.startswith("win") and "UDUNITS_PREFIX" not in os.environ:
     udunits2_prefix = os.path.join(sys.prefix, "Library")
 vendored_prefix = os.path.join(os.path.dirname(__file__), "dist", "extern")
 
