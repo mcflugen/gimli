@@ -62,6 +62,7 @@ jobs:
         env:
           CIBW_ENVIRONMENT_MACOS: >-
             MACOSX_DEPLOYMENT_TARGET=${{ matrix.mac_deployment }}
+            WITH_UDUNITS2="{package_dir}/dist/extern"
         with:
           only: ${{ matrix.cibw-only }}
 
