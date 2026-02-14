@@ -14,6 +14,15 @@ PYTHON_VERSION = "3.12"
 @nox.session(python=PYTHON_VERSION)
 def test(session: nox.Session) -> None:
     """Run the tests."""
+    for key in (
+        "LD_LIBRARY_PATH",
+        "PYTHONPATH",
+        "DYLD_LIBRARY_PATH",
+        "DYLD_FALLBACK_LIBRARY_PATH",
+        "DYLD_INSERT_LIBRARIES",
+    ):
+        session.env.pop(key, None)
+
     arg = session.posargs[0] if session.posargs else None
     if arg and os.path.isdir(arg):
         session.install(
@@ -36,7 +45,7 @@ def test(session: nox.Session) -> None:
 
     if "CI" in os.environ:
         args.append(f"--cov-report=xml:{ROOT.absolute()!s}/coverage.xml")
-    session.run("pytest", *args, env={})
+    session.run("pytest", *args)
 
     if "CI" not in os.environ:
         session.run("coverage", "report", "--ignore-errors", "--show-missing")
