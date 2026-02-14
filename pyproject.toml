@@ -94,7 +94,7 @@ before-build = [
     "cd extern/udunits-2.2.28",
     "mkdir -p m4",
     "autoreconf -fvi",
-    "./configure --disable-static --enable-shared --prefix=dist/extern",
+    "./configure --disable-static --enable-shared --prefix={package}/dist/extern",
     "make",
     "make install",
 ]
@@ -108,7 +108,7 @@ test-command = "pytest {package}/tests"
 before-all = "yum install -y flex libtool texinfo"
 
 [tool.cibuildwheel.macos.environment]
-WITH_UDUNITS2 = "{project}/dist/extern"
+WITH_UDUNITS2 = "{package}/dist/extern"
 MACOSX_DEPLOYMENT_TARGET = "12.0"
 CC = "clang"
 CXX = "clang++"
@@ -118,7 +118,7 @@ before-build = [
     "cd extern/udunits-2.2.28",
     "mkdir -p m4",
     "autoreconf -fvi",
-    "./configure --disable-static --enable-shared --prefix=$WITH_UDUNITS2",
+    "./configure --disable-static --enable-shared --prefix={package}/dist/extern",
     "make",
     "sudo make install",
 ]
