@@ -10,6 +10,10 @@ if sys.platform.startswith("win") and "UDUNITS_PREFIX" not in os.environ:
     udunits2_prefix = os.path.join(sys.prefix, "Library")
 vendored_prefix = os.path.join(os.path.dirname(__file__), "dist", "extern")
 
+extra_link_args = []
+if sys.platform.startswith("linux"):
+    extra_link_args.append(f"-Wl,-rpath,{os.path.join(udunits2_prefix, 'lib')}")
+
 setup(
     include_package_data=True,
     ext_modules=[
@@ -26,6 +30,7 @@ setup(
                 os.path.join(udunits2_prefix, "lib"),
                 os.path.join(vendored_prefix, "lib"),
             ],
+            extra_link_args=extra_link_args,
         )
     ],
 )
