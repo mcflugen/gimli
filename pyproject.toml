@@ -109,23 +109,34 @@ before-all = "yum install -y flex libtool texinfo"
 [tool.cibuildwheel.linux.environment]
 WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
 
-[tool.cibuildwheel.macos.environment]
-WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
-MACOSX_DEPLOYMENT_TARGET = "12.0"
-CC = "clang"
-CXX = "clang++"
+# [tool.cibuildwheel.macos.environment]
+# WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
+# MACOSX_DEPLOYMENT_TARGET = "10.9"
+# CC = "clang"
+# CXX = "clang++"
 
 [tool.cibuildwheel.macos]
-before-build = [
-    'PREFIX="$(pwd -P)/dist/extern"',
-    'mkdir -p "$PREFIX"',
-    "cd extern/udunits-2.2.28",
-    "mkdir -p m4",
-    "autoreconf -fvi",
-    "./configure --disable-static --enable-shared --prefix=$PREFIX",
-    "make",
-    "sudo make install",
-]
+environment = """
+UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
+CPPFLAGS="-I$UDUNITS2_PREFIX/include"
+CFLAGS="-I$UDUNITS2_PREFIX/include"
+LDFLAGS="-L$UDUNITS2_PREFIX/lib"
+PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
+"""
+before-build = """
+bash -c 'set -eux
+PREFIX="$(pwd -P)/dist/extern"
+rm -rf "$PREFIX"
+mkdir -p "$PREFIX"
+
+cd extern/udunits-2.2.28
+mkdir -p m4
+autoreconf -fvi
+./configure --disable-static --enable-shared --prefix="$PREFIX"
+make -j2
+make install
+'
+"""
 before-all = "brew install automake libtool texinfo"
 test-command = """
 pytest {project}/tests || (
