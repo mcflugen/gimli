@@ -106,6 +106,8 @@ test-command = "pytest {package}/tests"
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y flex libtool texinfo"
+[tool.cibuildwheel.linux.environment]
+WITH_UDUNITS2 = "{package}/dist/extern"
 
 [tool.cibuildwheel.macos.environment]
 WITH_UDUNITS2 = "{package}/dist/extern"
