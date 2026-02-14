@@ -107,20 +107,22 @@ test-command = "pytest {package}/tests"
 [tool.cibuildwheel.linux]
 before-all = "yum install -y flex libtool texinfo"
 [tool.cibuildwheel.linux.environment]
-WITH_UDUNITS2 = "{project}/dist/extern"
+WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
 
 [tool.cibuildwheel.macos.environment]
-WITH_UDUNITS2 = "{project}/dist/extern"
+WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
 MACOSX_DEPLOYMENT_TARGET = "12.0"
 CC = "clang"
 CXX = "clang++"
 
 [tool.cibuildwheel.macos]
 before-build = [
+    'PREFIX="$(pwd -P)/dist/extern"',
+    'mkdir -p "$PREFIX"',
     "cd extern/udunits-2.2.28",
     "mkdir -p m4",
     "autoreconf -fvi",
-    "./configure --disable-static --enable-shared --prefix={project}/dist/extern",
+    "./configure --disable-static --enable-shared --prefix=$PREFIX",
     "make",
     "sudo make install",
 ]
