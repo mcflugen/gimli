@@ -90,14 +90,20 @@ where = [
 build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
 skip = "*-win32*"
 archs = "x86_64,aarch64,arm64,AMD64,x86"
-before-build = [
-    "cd extern/udunits-2.2.28",
-    "mkdir -p m4",
-    "autoreconf -fvi",
-    "./configure --disable-static --enable-shared --prefix={project}/dist/extern",
-    "make",
-    "make install",
-]
+before-build = """
+bash -c 'set -eux
+PREFIX="$(pwd -P)/dist/extern"
+rm -rf "$PREFIX"
+mkdir -p "$PREFIX"
+
+cd extern/udunits-2.2.28
+mkdir -p m4
+autoreconf -fvi
+./configure --disable-static --enable-shared --prefix="$PREFIX"
+make -j2
+make install
+'
+"""
 test-requires = [
     "hypothesis",
     "pytest",
@@ -107,7 +113,14 @@ test-command = "pytest {package}/tests"
 [tool.cibuildwheel.linux]
 before-all = "yum install -y flex libtool texinfo"
 [tool.cibuildwheel.linux.environment]
-WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
+environment = """
+UDUNITS2_PREFIX="$(pwd -P)/dist/extern"
+CPPFLAGS="-I$UDUNITS2_PREFIX/include"
+CFLAGS="-I$UDUNITS2_PREFIX/include"
+LDFLAGS="-L$UDUNITS2_PREFIX/lib"
+PKG_CONFIG_PATH="$UDUNITS2_PREFIX/lib/pkgconfig"
+LD_LIBRARY_PATH="$UDUNITS2_PREFIX/lib:${LD_LIBRARY_PATH:-}"
+"""
 
 # [tool.cibuildwheel.macos.environment]
 # WITH_UDUNITS2 ="$(pwd -P)/dist/extern"
