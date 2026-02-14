@@ -120,23 +120,23 @@ jobs:
           pip install nox
           nox -s test --verbose -- dist
 
-      - name: Coveralls
-        if: matrix.os == 'ubuntu-latest'
-        uses: AndreMiras/coveralls-python-action@develop
-        with:
-          parallel: true
-          flag-name: py${{ matrix.python-version }}-${{ matrix.os }}
-          debug: true
+      # - name: Coveralls
+      #   if: matrix.os == 'ubuntu-latest'
+      #   uses: AndreMiras/coveralls-python-action@develop
+      #   with:
+      #     parallel: true
+      #     flag-name: py${{ matrix.python-version }}-${{ matrix.os }}
+      #     debug: true
 
-  coveralls_finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Coveralls Finished
-        uses: AndreMiras/coveralls-python-action@develop
-        with:
-          parallel-finished: true
-          debug: true
+  # coveralls_finish:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Coveralls Finished
+  #       uses: AndreMiras/coveralls-python-action@develop
+  #       with:
+  #         parallel-finished: true
+  #         debug: true
 
   check_tag:
     needs: test
