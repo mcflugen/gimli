@@ -21,12 +21,10 @@ setup(
                 numpy.get_include(),
                 os.path.join(udunits2_prefix, "include"),
                 os.path.join(vendored_prefix, "include"),
-                os.path.join("/usr", "local", "include"),
             ],
             library_dirs=[
                 os.path.join(udunits2_prefix, "lib"),
                 os.path.join(vendored_prefix, "lib"),
-                os.path.join("/usr", "local", "lib"),
             ],
         )
     ],
