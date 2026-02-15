@@ -21,7 +21,7 @@ def test(session: nox.Session) -> None:
         "DYLD_FALLBACK_LIBRARY_PATH",
         "DYLD_INSERT_LIBRARIES",
     ):
-        session.env.pop(key, None)
+        session.env[key] = ""
 
     arg = session.posargs[0] if session.posargs else None
     if arg and os.path.isdir(arg):
