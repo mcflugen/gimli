@@ -10,7 +10,6 @@ from gimli._utils import load_database
 
 
 class UnitSystem(Mapping[str, Unit], _UnitSystem):
-
     """A system of units.
 
     A unit-system is a set of units that are all defined in terms of
@@ -52,7 +51,7 @@ class UnitSystem(Mapping[str, Unit], _UnitSystem):
         else:
             return self.data[key]
 
-    def __iter__(self) -> Generator[str, None, None]:
+    def __iter__(self) -> Generator[str]:
         yield from self.data
 
     def __len__(self) -> int:
