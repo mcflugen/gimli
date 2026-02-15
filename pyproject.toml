@@ -44,9 +44,9 @@ dev = [
     "nox",
 ]
 testing = [
+    "coverage",
     "hypothesis",
     "pytest",
-    "pytest-cov",
 ]
 
 [project.urls]
