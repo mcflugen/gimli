@@ -41,10 +41,11 @@ def test(session: nox.Session) -> None:
         *("-r", "requirements-testing.in"),
     )
 
-    args = ["--cov", "gimli.units", "-vvv"]
+    # args = ["--cov", "gimli.units", "-vvv"]
+    args = ["-vvv"]
 
-    if "CI" in os.environ:
-        args.append(f"--cov-report=xml:{ROOT.absolute()!s}/coverage.xml")
+    # if "CI" in os.environ:
+    #     args.append(f"--cov-report=xml:{ROOT.absolute()!s}/coverage.xml")
     session.run(
     "python",
     "-I",
@@ -66,8 +67,8 @@ for p in candidates:
 )
     session.run("pytest", *args)
 
-    if "CI" not in os.environ:
-        session.run("coverage", "report", "--ignore-errors", "--show-missing")
+    # if "CI" not in os.environ:
+    #     session.run("coverage", "report", "--ignore-errors", "--show-missing")
 
 
 @nox.session

@@ -46,7 +46,6 @@ dev = [
 testing = [
     "hypothesis",
     "pytest",
-    "pytest-cov",
 ]
 
 [project.urls]
