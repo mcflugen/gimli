@@ -45,6 +45,25 @@ def test(session: nox.Session) -> None:
 
     if "CI" in os.environ:
         args.append(f"--cov-report=xml:{ROOT.absolute()!s}/coverage.xml")
+    session.run(
+    "python",
+    "-I",
+    "-c",
+    r"""
+import sys, site, numpy as np, os
+print("numpy:", np.__version__)
+print("numpy.__file__:", np.__file__)
+print("ENABLE_USER_SITE:", site.ENABLE_USER_SITE)
+print("USER_SITE:", getattr(site, "getusersitepackages", lambda: None)())
+print("site-packages:", site.getsitepackages())
+# show any sys.path entries that look like they could contain numpy
+candidates = [p for p in sys.path if p and ("site-packages" in p or "dist-packages" in p)]
+print("sys.path candidates:")
+for p in candidates:
+    print("  ", p)
+""",
+    env={},
+)
     session.run("pytest", *args)
 
     if "CI" not in os.environ:
