@@ -2,7 +2,7 @@
 
 ## 0.3.4 (unreleased)
 
-- Nothing changed yet.
+- Fixed cibuildwheel builds for *macos* *x86_64*.
 
 ## 0.3.3 (2024-10-04)
 
