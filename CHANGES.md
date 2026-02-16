@@ -1,5 +1,11 @@
 # Changelog for gimli
 
+## 0.3.5 (unreleased)
+
+
+- Nothing changed yet.
+
+
 ## 0.3.4 (2026-02-16)
 
 - Fixed cibuildwheel builds for *macos* *x86_64*.
