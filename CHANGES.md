@@ -1,6 +1,6 @@
 # Changelog for gimli
 
-## 0.3.4 (unreleased)
+## 0.3.4 (2026-02-16)
 
 - Fixed cibuildwheel builds for *macos* *x86_64*.
 - Fixed failing tests by using *coverage* directly instead of *pytest-cov*.
