@@ -1,3 +1,4 @@
+import operator
 import os
 import random
 
@@ -150,21 +151,34 @@ def test_unit_formatting_bad_encoding(system, encoding):
 @pytest.mark.parametrize(
     ("lhs", "cmp_", "rhs"),
     [
-        ("m", "lt", "km"),
-        ("m", "le", "km"),
-        ("m", "le", "m"),
-        ("m", "eq", "m"),
-        ("m", "ne", "km"),
-        ("km", "ge", "m"),
-        ("km", "ge", "km"),
-        ("km", "gt", "m"),
+        ("m", operator.lt, "km"),
+        ("m", operator.le, "km"),
+        ("m", operator.le, "m"),
+        ("m", operator.eq, "m"),
+        ("m", operator.ne, "km"),
+        ("km", operator.ge, "m"),
+        ("km", operator.ge, "km"),
+        ("km", operator.gt, "m"),
     ],
 )
 def test_unit_comparisons(system, lhs, cmp_, rhs):
-    compare = getattr(system.Unit(lhs), f"__{cmp_}__")
-    assert compare(system.Unit(rhs))
+    assert cmp_(system.Unit(lhs), system.Unit(rhs))
+
+
+@pytest.mark.parametrize(
+    ("lhs", "cmp_", "rhs"),
+    [
+        ("m", operator.lt, "km"),
+        ("m", operator.le, "km"),
+        ("m", operator.le, "m"),
+        ("km", operator.ge, "m"),
+        ("km", operator.ge, "km"),
+        ("km", operator.gt, "m"),
+    ],
+)
+def test_unit_str_comparisons(system, lhs, cmp_, rhs):
     with pytest.raises(TypeError):
-        compare(rhs)
+        cmp_(system.Unit(lhs), rhs)
 
 
 def test_unit_is_hashable(system):
@@ -176,8 +190,8 @@ def test_unit_is_hashable(system):
 
     d = {a: 1}
     assert d[a] == 1
-    assert a in set([a])
-    assert b in set([a])
+    assert a in {a}
+    assert b in {a}
 
 
 def test_unit_symbol(system):

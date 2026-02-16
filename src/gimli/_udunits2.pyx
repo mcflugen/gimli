@@ -7,6 +7,12 @@ import sys
 import numpy as np
 
 cimport numpy as np
+from cpython.object cimport Py_EQ
+from cpython.object cimport Py_GE
+from cpython.object cimport Py_GT
+from cpython.object cimport Py_LE
+from cpython.object cimport Py_LT
+from cpython.object cimport Py_NE
 from libc.stdlib cimport free
 from libc.stdlib cimport malloc
 from libc.string cimport strcpy
@@ -289,23 +295,23 @@ cdef class Unit:
         """
         return ut_compare(self._unit, other._unit)
 
-    def __lt__(self, other):
-        return self.compare(other) < 0
-
-    def __le__(self, other):
-        return self.compare(other) <= 0
-
-    def __eq__(self, other):
-        return self.compare(other) == 0
-
-    def __ge__(self, other):
-        return self.compare(other) >= 0
-
-    def __gt__(self, other):
-        return self.compare(other) > 0
-
-    def __ne__(self, other):
-        return self.compare(other) != 0
+    def __richcmp__(self, other, int op):
+        if not isinstance(other, Unit):
+            return NotImplemented
+        cdef int c = ut_compare(self._unit, (<Unit>other)._unit)
+        if op == Py_LT:
+            return c < 0
+        if op == Py_LE:
+            return c <= 0
+        if op == Py_EQ:
+            return c == 0
+        if op == Py_NE:
+            return c != 0
+        if op == Py_GT:
+            return c > 0
+        if op == Py_GE:
+            return c >= 0
+        return NotImplemented
 
     def __hash__(self):
         return hash(self.format(encoding="ascii", formatting=UnitFormatting.NAMES))
