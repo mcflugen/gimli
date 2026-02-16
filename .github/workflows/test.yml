@@ -27,43 +27,23 @@ jobs:
 
           # Linux aarch64
           - cibw-only: "cp310-manylinux_aarch64"
-            os: "ubuntu-latest"
+            os: "ubuntu-24.04-arm"
           - cibw-only: "cp311-manylinux_aarch64"
-            os: "ubuntu-latest"
+            os: "ubuntu-24.04-arm"
           - cibw-only: "cp312-manylinux_aarch64"
-            os: "ubuntu-latest"
+            os: "ubuntu-24.04-arm"
           - cibw-only: "cp313-manylinux_aarch64"
-            os: "ubuntu-latest"
-
-          # musllinux x86_64
-          - cibw-only: "cp310-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-musllinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-musllinux_x86_64"
-            os: "ubuntu-latest"
-
-          # musllinux aarch64
-          - cibw-only: "cp310-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-musllinux_aarch64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-musllinux_aarch64"
-            os: "ubuntu-latest"
+            os: "ubuntu-24.04-arm"
 
           # Mac x86_64
           - cibw-only: "cp310-macosx_x86_64"
-            os: "macos-13"
+            os: "macos-15-intel"
           - cibw-only: "cp311-macosx_x86_64"
-            os: "macos-13"
+            os: "macos-15-intel"
           - cibw-only: "cp312-macosx_x86_64"
-            os: "macos-13"
+            os: "macos-15-intel"
           - cibw-only: "cp313-macosx_x86_64"
-            os: "macos-13"
+            os: "macos-15-intel"
 
           # Mac arm64
           - cibw-only: "cp310-macosx_arm64"
@@ -94,18 +74,12 @@ jobs:
           #   os: "windows-latest"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Use Python 3.10
-        uses: actions/setup-python@v5
+      - name: Use Python 3.14
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
-
-      - name: Set up QEMU  # Needed to build aarch64 wheels
-        if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
+          python-version: '3.14'
 
       - name: Build wheels
         run: |
@@ -113,14 +87,14 @@ jobs:
           python -m cibuildwheel --only ${{ matrix.cibw-only }} --print-build-identifiers
 
       - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v2.0.2
+        uses: jwlawson/actions-setup-cmake@v2.1
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.2
+        uses: pypa/cibuildwheel@v3.3
         with:
           only: ${{ matrix.cibw-only }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: wheel-${{ matrix.os }}-${{ matrix.cibw-only }}
           path: ./wheelhouse/*.whl
@@ -130,7 +104,7 @@ jobs:
     name: "Show artifacts"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v7
       with:
         pattern: "wheel-*"
         merge-multiple: true
@@ -157,13 +131,13 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           pattern: "wheel-*"
           merge-multiple: true
@@ -223,7 +197,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           pattern: "wheel-*"
           merge-multiple: true
