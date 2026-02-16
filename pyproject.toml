@@ -2,6 +2,8 @@
 name = "gimli.units"
 requires-python = ">=3.10"
 description = "An object-oriented Python interface to udunits"
+license = "MIT"
+license-files = ["LICENSE.md"]
 keywords = [
     "earth science",
     "model coupling",
@@ -19,7 +21,6 @@ maintainers = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -35,9 +36,6 @@ dynamic = [
     "readme",
     "version",
 ]
-
-[project.license]
-text = "MIT"
 
 [project.optional-dependencies]
 dev = [
