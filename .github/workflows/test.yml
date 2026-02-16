@@ -15,63 +15,35 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Linux x86_64
-          - cibw-only: "cp310-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp311-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp312-manylinux_x86_64"
-            os: "ubuntu-latest"
-          - cibw-only: "cp313-manylinux_x86_64"
-            os: "ubuntu-latest"
+          - { os: ubuntu-latest, cibw-only: cp310-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp311-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp312-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp313-manylinux_x86_64 }
+          - { os: ubuntu-latest, cibw-only: cp314-manylinux_x86_64 }
 
-          # Linux aarch64
-          - cibw-only: "cp310-manylinux_aarch64"
-            os: "ubuntu-24.04-arm"
-          - cibw-only: "cp311-manylinux_aarch64"
-            os: "ubuntu-24.04-arm"
-          - cibw-only: "cp312-manylinux_aarch64"
-            os: "ubuntu-24.04-arm"
-          - cibw-only: "cp313-manylinux_aarch64"
-            os: "ubuntu-24.04-arm"
+          - { os: ubuntu-24.04-arm, cibw-only: cp310-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp311-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp312-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp313-manylinux_aarch64 }
+          - { os: ubuntu-24.04-arm, cibw-only: cp314-manylinux_aarch64 }
 
-          # Mac x86_64
-          - cibw-only: "cp310-macosx_x86_64"
-            os: "macos-15-intel"
-          - cibw-only: "cp311-macosx_x86_64"
-            os: "macos-15-intel"
-          - cibw-only: "cp312-macosx_x86_64"
-            os: "macos-15-intel"
-          - cibw-only: "cp313-macosx_x86_64"
-            os: "macos-15-intel"
+          - { os: macos-15-intel, cibw-only: cp310-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp311-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp312-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp313-macosx_x86_64, mac_deployment: "10.9" }
+          - { os: macos-15-intel, cibw-only: cp314-macosx_x86_64, mac_deployment: "10.9" }
 
-          # Mac arm64
-          - cibw-only: "cp310-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp311-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp312-macosx_arm64"
-            os: "macos-latest"
-          - cibw-only: "cp313-macosx_arm64"
-            os: "macos-latest"
+          - { os: macos-latest, cibw-only: cp310-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp311-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp312-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp313-macosx_arm64, mac_deployment: "11.0" }
+          - { os: macos-latest, cibw-only: cp314-macosx_arm64, mac_deployment: "11.0" }
 
-          # Windows 64bit
-          - cibw-only: "cp310-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp311-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp312-win_amd64"
-            os: "windows-latest"
-          - cibw-only: "cp313-win_amd64"
-            os: "windows-latest"
-
-          # Windows 32
-          # - cibw-only: "cp310-win32"
-          #   os: "windows-latest"
-          # - cibw-only: "cp311-win32"
-          #   os: "windows-latest"
-          # - cibw-only: "cp312-win32"
-          #   os: "windows-latest"
+          - { os: windows-latest, cibw-only: cp310-win_amd64 }
+          - { os: windows-latest, cibw-only: cp311-win_amd64 }
+          - { os: windows-latest, cibw-only: cp312-win_amd64 }
+          - { os: windows-latest, cibw-only: cp313-win_amd64 }
+          - { os: windows-latest, cibw-only: cp314-win_amd64 }
 
     steps:
       - uses: actions/checkout@v6
@@ -121,8 +93,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     runs-on: ${{ matrix.os }}
 
