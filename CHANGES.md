@@ -3,6 +3,8 @@
 ## 0.3.4 (unreleased)
 
 - Fixed cibuildwheel builds for *macos* *x86_64*.
+- Fixed failing tests by using *coverage* directly instead of *pytest-cov*.
+  This fixed tests that failed with double import of *numpy* errors.
 
 ## 0.3.3 (2024-10-04)
 
