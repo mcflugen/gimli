@@ -306,6 +306,9 @@ cdef class Unit:
     def __ne__(self, other):
         return self.compare(other) != 0
 
+    def __hash__(self):
+        return hash(self.format(encoding="ascii", formatting=UnitFormatting.NAMES))
+
     def format(self, encoding="ascii", formatting=UnitFormatting.NAMES):
         try:
             unit_encoding = UDUNITS_ENCODING[encoding]
