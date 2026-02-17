@@ -249,13 +249,14 @@ cdef class Unit:
         return self.UnitConverter(unit)
 
     cpdef UnitConverter(self, Unit unit):
+        if not ut_are_convertible(self._unit, unit._unit):
+            raise IncompatibleUnitsError(str(self), str(unit))
+
         with suppress_stdout():
             converter = ut_get_converter(self._unit, unit._unit)
 
         if converter == NULL:
-            status = ut_get_status()
-            raise UdunitsError(status)
-            # raise IncompatibleUnitsError(str(self), str(unit))
+            raise UdunitsError(ut_get_status())
 
         return UnitConverter.from_ptr(converter, owner=True)
 
