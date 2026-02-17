@@ -9,6 +9,7 @@
   of *Linux*, *Mac*, and *Windows*.
 - Added `nogil` blocks to the unit converters for speed imrovements for large
   arrays.
+- Added `NULL` checks to prevent possible segmentation faults.
 
 ## 0.3.3 (2024-10-04)
 

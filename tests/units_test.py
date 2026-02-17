@@ -254,6 +254,23 @@ def test_unit_converter_double_array(system, shape, dtype):
     assert values_in_km.dtype == dtype
 
 
+@pytest.mark.parametrize("dtype", (np.single, np.double))
+def test_unit_converter_empty_array(system, dtype):
+    values = np.asarray([], dtype=dtype)
+
+    meters = system.Unit("m")
+    km = system.Unit("km")
+
+    m_to_km = meters.to(km)
+    actual = m_to_km(values)
+    assert actual.size == 0
+    assert actual.dtype == dtype
+
+    out = np.empty_like(values)
+    actual = m_to_km(values, out=out)
+    assert actual is out
+
+
 @given(
     src_values=hynp.arrays(
         dtype=hynp.floating_dtypes(),
