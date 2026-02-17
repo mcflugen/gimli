@@ -313,7 +313,7 @@ cdef class Unit:
         try:
             unit_encoding = UDUNITS_ENCODING[encoding]
         except KeyError:
-            raise ValueError("unknown encoding ({encoding})")
+            raise ValueError(f"unknown encoding ({encoding!r})")
 
         str_len = ut_format(
             self._unit, self._buffer, 2048, opts=unit_encoding | formatting
