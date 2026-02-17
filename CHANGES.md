@@ -14,6 +14,7 @@
 - Fixed a bug in the error string for a bad encoding value in the unit formatter.
 - Changed error to `IncompatibleUnitsError` when trying to convert between
   units that are not compatible with one another.
+- Implemented `__richcmp__` in *cython* for for unit comparisons with `Units`.
 
 ## 0.3.3 (2024-10-04)
 
