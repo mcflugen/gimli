@@ -11,6 +11,7 @@
   arrays.
 - Added `NULL` checks to prevent possible segmentation faults.
 - Implemented `__hash__` for `Units`.
+- Fixed a bug in the error string for a bad encoding value in the unit formatter.
 
 ## 0.3.3 (2024-10-04)
 

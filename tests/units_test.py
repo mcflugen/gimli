@@ -140,6 +140,13 @@ def test_unit_formatting(system):
     )
 
 
+@pytest.mark.parametrize("encoding", ("", "bad-encoding-name", None))
+def test_unit_formatting_bad_encoding(system, encoding):
+    unit = system.Unit("0.1 lg(re m/(5 s)^2) @ 50")
+    with pytest.raises(ValueError, match="unknown encoding"):
+        unit.format(encoding=encoding)
+
+
 @pytest.mark.parametrize(
     ("lhs", "cmp_", "rhs"),
     [
