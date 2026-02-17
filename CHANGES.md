@@ -7,6 +7,8 @@
   This fixed tests that failed with double import of *numpy* errors.
 - Added tests for Python 3.10, 3.11, 3.12, 3.13, and 3.14 on the latest versions
   of *Linux*, *Mac*, and *Windows*.
+- Added `nogil` blocks to the unit converters for speed imrovements for large
+  arrays.
 
 ## 0.3.3 (2024-10-04)
 

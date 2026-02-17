@@ -63,13 +63,13 @@ cdef extern from "udunits2.h":
     void ut_free(ut_unit* unit)
 
     cv_converter* ut_get_converter(ut_unit* const src, ut_unit* const dst)
-    double cv_convert_double(const cv_converter* converter, const double value)
+    double cv_convert_double(const cv_converter* converter, const double value) nogil
     double* cv_convert_doubles(
         const cv_converter* converter, const double* src, size_t count, double* dst
-    )
+    ) nogil
     np.float32_t* cv_convert_floats(
         const cv_converter* converter, const np.float32_t* src, size_t count, np.float32_t* dst
-    )
+    ) nogil
     void cv_free(cv_converter* conv)
 
     ut_status ut_get_status()
@@ -437,7 +437,7 @@ cdef class UnitConverter:
         try:
             n_items = len(values)
         except TypeError:
-            return self._convert_scalar(values)
+            return float(self._convert_scalar(values))
         else:
             values_save, out_save = values, out
             values = as_floating_array(np.ascontiguousarray(values))
@@ -463,15 +463,19 @@ cdef class UnitConverter:
 
             return out
 
-    cdef _convert_scalar(self, value):
-        return cv_convert_double(self._conv, value)
+    cdef double _convert_scalar(self, value):
+        cdef double x = <double>value
+        with nogil:
+            return cv_convert_double(self._conv, x)
 
     cdef _convert_array(
         self,
         np.ndarray[DOUBLE_t, ndim=1] values,
         np.ndarray[DOUBLE_t, ndim=1] out,
     ):
-        cv_convert_doubles(self._conv, &values[0], len(values), &out[0])
+        cdef Py_ssize_t n = values.shape[0]
+        with nogil:
+            cv_convert_doubles(self._conv, &values[0], <size_t>n, &out[0])
         return out
 
     cdef _convert_float_array(
@@ -479,7 +483,9 @@ cdef class UnitConverter:
         np.ndarray[np.float32_t, ndim=1] values,
         np.ndarray[np.float32_t, ndim=1] out,
     ):
-        cv_convert_floats(self._conv, &values[0], len(values), &out[0])
+        cdef Py_ssize_t n = values.shape[0]
+        with nogil:
+            cv_convert_floats(self._conv, &values[0], <size_t>n, &out[0])
         return out
 
     def __dealloc__(self):
