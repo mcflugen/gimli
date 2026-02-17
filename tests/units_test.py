@@ -160,6 +160,19 @@ def test_unit_comparisons(system, lhs, cmp_, rhs):
         compare(rhs)
 
 
+def test_unit_is_hashable(system):
+    a = system.Unit("m")
+    b = system.Unit("meter")
+
+    if a == b:
+        assert hash(a) == hash(b)
+
+    d = {a: 1}
+    assert d[a] == 1
+    assert a in set([a])
+    assert b in set([a])
+
+
 def test_unit_symbol(system):
     meters = system.Unit("m")
     assert meters.symbol == "m"
