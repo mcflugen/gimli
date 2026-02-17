@@ -87,6 +87,8 @@ cdef class _UnitSystem:
         as_bytes = filepath.encode("utf-8")
 
         self._filepath = <char*>malloc((len(as_bytes) + 1) * sizeof(char))
+        if self._filepath == NULL:
+            raise MemoryError()
         strcpy(self._filepath, as_bytes)
 
         with suppress_stdout():
@@ -204,12 +206,13 @@ cdef class _UnitSystem:
             raise RuntimeError("unknown unit_system status")
 
     def __dealloc__(self):
-        ut_free_system(self._unit_system)
-        free(self._filepath)
-        self._unit_system = NULL
-        self._filepath = NULL
+        if self._unit_system != NULL:
+            ut_free_system(self._unit_system)
+            self._unit_system = NULL
+        if self._filepath != NULL:
+            free(self._filepath)
+            self._filepath = NULL
         self._status = 0
-
 
 cdef class Unit:
 
@@ -257,11 +260,10 @@ cdef class Unit:
         return UnitConverter.from_ptr(converter, owner=True)
 
     def __dealloc__(self):
-        if self._unit is not NULL and self.ptr_owner is True:
+        if self.ptr_owner and self._unit != NULL:
             ut_free(self._unit)
-            self._unit = NULL
-            self.ptr_owner = False
-
+        self._unit = NULL
+        self.ptr_owner = False
 
     def __str__(self):
         return self.format(encoding="ascii")
@@ -474,6 +476,8 @@ cdef class UnitConverter:
         np.ndarray[DOUBLE_t, ndim=1] out,
     ):
         cdef Py_ssize_t n = values.shape[0]
+        if n == 0:
+            return out
         with nogil:
             cv_convert_doubles(self._conv, &values[0], <size_t>n, &out[0])
         return out
@@ -484,6 +488,8 @@ cdef class UnitConverter:
         np.ndarray[np.float32_t, ndim=1] out,
     ):
         cdef Py_ssize_t n = values.shape[0]
+        if n == 0:
+            return out
         with nogil:
             cv_convert_floats(self._conv, &values[0], <size_t>n, &out[0])
         return out
