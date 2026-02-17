@@ -12,6 +12,8 @@
 - Added `NULL` checks to prevent possible segmentation faults.
 - Implemented `__hash__` for `Units`.
 - Fixed a bug in the error string for a bad encoding value in the unit formatter.
+- Changed error to `IncompatibleUnitsError` when trying to convert between
+  units that are not compatible with one another.
 
 ## 0.3.3 (2024-10-04)
 
