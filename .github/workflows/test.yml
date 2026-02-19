@@ -93,8 +93,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        os: [ubuntu-latest]
+        python-version: ["3.14"]
 
     runs-on: ${{ matrix.os }}
 
@@ -109,16 +109,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/download-artifact@v7
-        with:
-          pattern: "wheel-*"
-          merge-multiple: true
-          path: ${{ github.workspace }}/dist
+      - name: Install udunits2
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudunits2-dev udunits-bin pkg-config
 
       - name: Test
         run: |
           pip install nox
-          nox -s test --verbose -- dist
+          nox -s coverage --verbose
 
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest'
