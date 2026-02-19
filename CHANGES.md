@@ -17,6 +17,7 @@
 - Implemented `__richcmp__` in *cython* for for unit comparisons with `Units`.
 - Added a *coverage* session to the *nox* file that runs coverage on an editable
   install rather than on a wheel.
+- Replaced *coveralls* with *Codecov* in the CI.
 
 ## 0.3.3 (2024-10-04)
 
