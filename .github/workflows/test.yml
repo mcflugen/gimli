@@ -86,9 +86,8 @@ jobs:
       run: |
         ls -l ${{ github.workspace }}/dist
 
-  test:
-    needs: build-wheels
-    name: Run the tests
+  coverage:
+    name: Run test coverage
 
     strategy:
       fail-fast: false
@@ -114,31 +113,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libudunits2-dev udunits-bin pkg-config
 
-      - name: Test
+      - name: Coverage
         run: |
           pip install nox
           nox -s coverage --verbose
 
-      - name: Coveralls
-        if: matrix.os == 'ubuntu-latest'
-        uses: AndreMiras/coveralls-python-action@develop
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          parallel: true
-          flag-name: py${{ matrix.python-version }}-${{ matrix.os }}
-          debug: true
-
-  coveralls_finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Coveralls Finished
-        uses: AndreMiras/coveralls-python-action@develop
-        with:
-          parallel-finished: true
-          debug: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   check_tag:
-    needs: test
+    needs: "build-wheels"
     runs-on: ubuntu-latest
     outputs:
       publish_url: ${{ steps.check-publish.outputs.publish_url }}
