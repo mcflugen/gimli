@@ -31,12 +31,18 @@ def test(session: nox.Session) -> None:
         *("-r", "requirements.in"),
         *("-r", "requirements-testing.in"),
     )
+    session.run("pytest", *_pytest_args())
 
-    session.run(
-        "coverage", "run", "--source=gimli,tests", "--branch", "--module", "pytest"
+
+@nox.session
+def coverage(session: nox.Session) -> None:
+    session.install(
+        *("-r", "requirements.in"),
+        *("-r", "requirements-testing.in"),
     )
-    session.run("coverage", "report", "--ignore-errors", "--show-missing")
-    session.run("coverage", "xml", "-o", "coverage.xml")
+
+    session.install("-e", ".")
+    _coverage(session, tmpdir=False)
 
 
 @nox.session
@@ -259,3 +265,32 @@ def _clean_rglob(pattern):
             p.rmdir()
         else:
             p.unlink()
+
+
+def _pytest_args():
+    return (
+        "--config-file",
+        os.path.join(str(ROOT), "pyproject.toml"),
+        "--doctest-modules",
+        "--pyargs",
+        "gimli",
+        os.path.join(str(ROOT), "tests"),
+    )
+
+
+def _coverage(session: nox.Session, tmpdir: bool = True) -> None:
+    if tmpdir:
+        tmp_dir = session.create_tmp()
+        session.chdir(tmp_dir)
+
+    session.run(
+        "coverage",
+        "run",
+        *("-m", "pytest"),
+        *_pytest_args(),
+        env={"COVERAGE_CORE": "sysmon"},
+    )
+
+    session.run("coverage", "report", "--ignore-errors", "--show-missing")
+    if "CI" in os.environ:
+        session.run("coverage", "xml", "-o", os.path.join(str(ROOT), "coverage.xml"))
