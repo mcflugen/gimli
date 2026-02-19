@@ -15,6 +15,8 @@
 - Changed error to `IncompatibleUnitsError` when trying to convert between
   units that are not compatible with one another.
 - Implemented `__richcmp__` in *cython* for for unit comparisons with `Units`.
+- Added a *coverage* session to the *nox* file that runs coverage on an editable
+  install rather than on a wheel.
 
 ## 0.3.3 (2024-10-04)
 
