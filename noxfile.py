@@ -7,40 +7,31 @@ import shutil
 import nox
 
 PROJECT = "gimli.units"
-ROOT = pathlib.Path(__file__).parent
-PYTHON_VERSION = "3.12"
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-@nox.session(python=PYTHON_VERSION)
+@nox.session
 def test(session: nox.Session) -> None:
     """Run the tests."""
-    arg = session.posargs[0] if session.posargs else None
-    if arg and os.path.isdir(arg):
-        session.install(
-            "gimli.units",
-            f"--find-links={arg}",
-            "--no-deps",
-            "--no-index",
-        )
-    elif arg and os.path.isfile(arg):
-        session.install(arg, "--no-deps")
-    else:
-        session.install(".", "--no-deps")
-
     session.install(
         *("-r", "requirements.in"),
         *("-r", "requirements-testing.in"),
     )
-    session.run("pytest", *_pytest_args())
+
+    _print_python_version(session)
+    _install_from_path(session, path=session.posargs[0] if session.posargs else None)
+    _test(session)
 
 
 @nox.session
 def coverage(session: nox.Session) -> None:
+    """Run the tests and coverage."""
     session.install(
         *("-r", "requirements.in"),
         *("-r", "requirements-testing.in"),
     )
 
+    _print_python_version(session)
     session.install("-e", ".")
     _coverage(session, tmpdir=False)
 
@@ -63,9 +54,14 @@ def build(session: nox.Session) -> None:
 
 @nox.session(name="build-extern", python=None)
 def build_extern(session: nox.Session) -> None:
-    build_dir = str(ROOT / "build/extern")
-    inst_dir = str(ROOT / "dist/extern")
-    src_dir = str(ROOT / "extern/udunits-2.2.28")
+    _build_extern(session, session.posargs[0] if session.posargs else None)
+
+
+def _build_extern(session: nox.Session, inst_dir=None) -> str:
+    inst_dir = os.path.abspath(session.create_tmp() if inst_dir is None else inst_dir)
+
+    build_dir = os.path.join(ROOT, "build", "extern")
+    src_dir = os.path.join(ROOT, "extern", "udunits-2.2.28")
 
     os.makedirs(inst_dir, exist_ok=True)
 
@@ -73,7 +69,7 @@ def build_extern(session: nox.Session) -> None:
     with session.chdir(os.path.join(build_dir, "expat")):
         session.run(
             "cmake",
-            *("-S", str(ROOT / "extern/expat-2.6.0/")),
+            *("-S", os.path.join(ROOT, "extern", "expat-2.6.0/")),
             *("-D", f"CMAKE_INSTALL_PREFIX={inst_dir}"),
             external=True,
         )
@@ -120,6 +116,8 @@ def build_extern(session: nox.Session) -> None:
             *("--target", "install"),
             external=True,
         )
+
+    return inst_dir
 
 
 @nox.session(name="build-docs")
@@ -235,8 +233,9 @@ def clean(session):
         (ROOT,) if not session.posargs else (pathlib.Path(f) for f in session.posargs)
     )
 
+    base = os.path.realpath(ROOT)
     for folder in folders:
-        if not str(folder.resolve()).startswith(str(ROOT.resolve())):
+        if os.path.commonpath([base, os.path.realpath(folder)]) != base:
             session.log(f"skipping {folder}: folder is outside of repository")
             continue
 
@@ -267,14 +266,51 @@ def _clean_rglob(pattern):
             p.unlink()
 
 
+def _print_python_version(session: nox.Session) -> None:
+    session.log(f"nox session.python = {session.python}")
+    session.run("python", "-c", "import sys; print(sys.executable); print(sys.version)")
+
+
+def _test(session: nox.Session, path=None, tmpdir: bool = True) -> None:
+    if tmpdir:
+        tmp = session.create_tmp()
+        session.chdir(tmp)
+    session.run("pytest", *_pytest_args())
+
+
+def _install_from_path(session: nox.Session, path: str | None = None) -> None:
+    if path is None:
+        _install_editable(session)
+    elif os.path.isfile(path):
+        session.install(path)
+    elif os.path.isdir(path):
+        session.install(
+            "gimli.units",
+            f"--find-links={path}",
+            "--no-deps",
+            "--no-index",
+        )
+    else:
+        session.error("path must be a source distribution or folder")
+
+
+def _install_editable(session: nox.Session, inst_dir=None) -> None:
+    if inst_dir is None:
+        inst_dir = _build_extern(session)
+
+    session.install("-e", ".", env={"UDUNITS2_PREFIX": inst_dir})
+
+    return inst_dir
+
+
 def _pytest_args():
     return (
         "--config-file",
-        os.path.join(str(ROOT), "pyproject.toml"),
+        os.path.join(ROOT, "pyproject.toml"),
         "--doctest-modules",
         "--pyargs",
         "gimli",
-        os.path.join(str(ROOT), "tests"),
+        os.path.join(ROOT, "tests"),
     )
 
 
@@ -293,4 +329,4 @@ def _coverage(session: nox.Session, tmpdir: bool = True) -> None:
 
     session.run("coverage", "report", "--ignore-errors", "--show-missing")
     if "CI" in os.environ:
-        session.run("coverage", "xml", "-o", os.path.join(str(ROOT), "coverage.xml"))
+        session.run("coverage", "xml", "-o", os.path.join(ROOT, "coverage.xml"))
