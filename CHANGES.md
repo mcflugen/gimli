@@ -20,6 +20,8 @@
 - Replaced *coveralls* with *Codecov* in the CI.
 - Fixed an issue that caused all of the CI tests to run with the same python
   version.
+- Changed the CI to publish to PyPI/TestPyPI when the workflow is manually
+  triggered rather than looking for a tag.
 
 ## 0.3.3 (2024-10-04)
 
