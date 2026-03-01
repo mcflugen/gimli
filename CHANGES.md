@@ -24,6 +24,7 @@
   triggered rather than looking for a tag.
 - Link to static libraries when building wheels.
 - Removed deprecated ``FileType`` *argparse* types from the *cli*.
+- Added new api functions ``convert``, ``make_converter``, and ``get_unit_system``.
 
 ## 0.3.3 (2024-10-04)
 
