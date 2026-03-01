@@ -122,15 +122,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install udunits2
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudunits2-dev udunits-bin pkg-config
-
       - name: Coverage
         run: |
           pip install nox
-          nox -s coverage --force-pythons=${{ matrix.python-version }} --verbose
+          nox -s build-vendor coverage --force-pythons=${{ matrix.python-version }} --verbose -- dist/vendor
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
