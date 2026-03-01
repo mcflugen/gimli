@@ -22,7 +22,6 @@ from gimli._constants import UnitEncoding
 from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._utils import get_xml_path
-from gimli._utils import suppress_stdout
 from gimli.errors import IncompatibleUnitsError
 
 DOUBLE = np.double
@@ -39,6 +38,9 @@ class UdunitsError(Exception):
     def __str__(self):
         return f"udunits error ({self.code})"
 
+cdef extern from "stdarg.h":
+    ctypedef struct va_list:
+        pass
 
 cdef extern from "udunits2.h":
     ctypedef struct ut_system:
@@ -49,6 +51,7 @@ cdef extern from "udunits2.h":
         pass
     ctypedef int ut_encoding;
     ctypedef int ut_status;
+    ctypedef int (*ut_error_message_handler)(const char* fmt, va_list args)
 
     const char* ut_get_path_xml(const char* path, ut_status* status)
     ut_unit* ut_get_unit_by_symbol(const ut_system* system, const char* symbol)
@@ -80,6 +83,9 @@ cdef extern from "udunits2.h":
 
     ut_status ut_get_status()
 
+    ut_error_message_handler ut_set_error_message_handler(ut_error_message_handler handler)
+    int ut_ignore(const char* fmt, va_list args)
+
 
 cdef class _UnitSystem:
     cdef ut_system* _unit_system
@@ -96,9 +102,8 @@ cdef class _UnitSystem:
         if self._filepath == NULL:
             raise MemoryError()
         strcpy(self._filepath, as_bytes)
-
-        with suppress_stdout():
-            self._unit_system = ut_read_xml(self._filepath)
+        ut_set_error_message_handler(ut_ignore)
+        self._unit_system = ut_read_xml(self._filepath)
 
         if self._unit_system == NULL:
             status = ut_get_status()
@@ -258,8 +263,7 @@ cdef class Unit:
         if not ut_are_convertible(self._unit, unit._unit):
             raise IncompatibleUnitsError(str(self), str(unit))
 
-        with suppress_stdout():
-            converter = ut_get_converter(self._unit, unit._unit)
+        converter = ut_get_converter(self._unit, unit._unit)
 
         if converter == NULL:
             raise UdunitsError(ut_get_status())

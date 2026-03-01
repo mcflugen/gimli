@@ -24,6 +24,7 @@
   triggered rather than looking for a tag.
 - Link to static libraries when building wheels.
 - Removed deprecated ``FileType`` *argparse* types from the *cli*.
+- Set the *udunits* error message handler to suppress error messages.
 
 ## 0.3.3 (2024-10-04)
 
