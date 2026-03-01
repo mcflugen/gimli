@@ -53,11 +53,34 @@ which can be found in the `extern` folder of this repository).
 
 ## Usage
 
-Primarily, *gimli.units* is a Python module with an [API](#API) that reflects that of
-the *udunits2* library. *gimli*, however, also comes with a
-[command-line interface](#command-line-interface).
+### Quick conversions
 
-# API
+Use `gimli.convert` to convert scalars or arrays between unit strings:
+
+```python
+>>> from gimli import convert
+
+>>> convert(10.0, "N", "lb.ft/s2")
+72.33013851209893
+>>> convert([0.0, 250.0, 1000.0], "N", "lb*ft/s^2")
+array([   0.        , 1808.2534628 , 7233.01385121])
+```
+
+### Reuse converters
+
+If you will apply the same conversion many times, build a converter once:
+
+```python
+>>> from gimli import make_converter
+
+>>> m_to_ft = make_converter("m", "ft")
+>>> m_to_ft([0.0, 1.0, 2.0])
+array([0.        , 3.2808399 , 6.56167979])
+>>> m_to_ft(3.0)
+9.842519685039369
+```
+
+### Unit Systems
 
 You primarily will access *gimli* through *gimli.units*,
 

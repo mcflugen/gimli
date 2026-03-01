@@ -170,7 +170,7 @@ warn_unused_ignores = true
 [tool.pytest.ini_options]
 minversion = "6.0.0rc1"
 testpaths = [
-    "tests",
+    "src/gimli", "tests",
 ]
 norecursedirs = [
     ".*",
@@ -179,8 +179,6 @@ norecursedirs = [
     "dist",
 ]
 addopts = [
-    "--ignore=bmi_tester/bootstrap",
-    "--ignore=bmi_tester/tests",
     "--tb=native",
     "--strict-markers",
     "--durations=16",

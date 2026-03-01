@@ -1,3 +1,3 @@
-from gimli._system import UnitSystem
+from gimli._api import get_unit_system
 
-units = UnitSystem()
+units = get_unit_system()
