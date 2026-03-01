@@ -33,7 +33,7 @@ def main(argv: tuple[str, ...] | None = None) -> int:
         action="store_true",
         help="Also emit status messages to stderr.",
     )
-    parser.add_argument("file", type=argparse.FileType("rb"), nargs="*")
+    parser.add_argument("file", nargs="*")
     parser.add_argument(
         *("-f", "--from"),
         dest="from_",
@@ -49,9 +49,7 @@ def main(argv: tuple[str, ...] | None = None) -> int:
         default=system.Unit("1"),
         help="Destination units.",
     )
-    parser.add_argument(
-        "-o", "--output", type=argparse.FileType("w"), default=sys.stdout
-    )
+    parser.add_argument("-o", "--output", default=sys.stdout)
 
     args = parser.parse_args(argv)
 
@@ -73,7 +71,7 @@ def main(argv: tuple[str, ...] | None = None) -> int:
 
     for name in args.file:
         if args.verbose and not args.quiet:
-            out(f"[info] reading {name.name}")
+            out(f"[info] reading {name}")
         array = np.loadtxt(name, delimiter=",")
         np.savetxt(
             args.output,

@@ -29,6 +29,16 @@ def test_no_op(capsys):
     assert capsys.readouterr().out == ""
 
 
+def test_verbose(tmpdir, capsys):
+    values = np.arange(12.0).reshape((3, 4))
+    with tmpdir.as_cwd():
+        np.savetxt("foobar.txt", values, delimiter=",")
+        assert main(["--verbose", "--from=m", "--to=km", "foobar.txt"]) == 0
+
+    last_line = capsys.readouterr().err.strip().splitlines()[-1]
+    assert last_line == "[info] reading foobar.txt"
+
+
 @pytest.mark.parametrize("shape", [(-1,), (-1, 1), (3, -1)])
 def test_from_file(tmpdir, shape, capsys):
     values = np.arange(12.0).reshape(shape)
