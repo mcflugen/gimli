@@ -23,6 +23,7 @@
 - Changed the CI to publish to PyPI/TestPyPI when the workflow is manually
   triggered rather than looking for a tag.
 - Link to static libraries when building wheels.
+- Removed deprecated ``FileType`` *argparse* types from the *cli*.
 
 ## 0.3.3 (2024-10-04)
 
