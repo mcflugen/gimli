@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import contextlib
 import os
 import sys
 from collections.abc import Generator
-from functools import partial
 from typing import Any
 from xml.etree import ElementTree
 
@@ -14,12 +15,17 @@ else:  # pragma: no cover (<PY312)
 from gimli._constants import UnitStatus
 from gimli.errors import DatabaseNotFoundError
 
-out = partial(print, file=sys.stderr)
-err = partial(print, file=sys.stderr)
+
+def out(*args: Any, **kwds: Any) -> None:
+    print(*args, file=sys.stderr, **kwds)
+
+
+def err(*args: Any, **kwds: Any) -> None:
+    print(*args, file=sys.stderr, **kwds)
 
 
 @contextlib.contextmanager
-def suppress_stdout() -> Generator[None, None, None]:
+def suppress_stdout() -> Generator[None]:
     null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
     # Save the actual stdout (1) and stderr (2) file descriptors.
     save_fds = [os.dup(1), os.dup(2)]
