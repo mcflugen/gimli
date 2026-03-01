@@ -9,7 +9,6 @@ from numpy.typing import NDArray
 from gimli._system import UnitSystem
 from gimli._utils import get_xml_path
 
-
 _UNIT_SYSTEM_CACHE: dict[str, UnitSystem] = {}
 
 
@@ -170,3 +169,6 @@ class Converter:
 
 def _canonicalize_path(path: str) -> str:
     return os.path.normcase(os.path.abspath(os.path.normpath(path)))
+
+
+units = get_unit_system()
