@@ -13,7 +13,7 @@ else:  # pragma: no cover (<PY312)
     import importlib_resources
 
 from gimli._constants import UnitStatus
-from gimli.errors import DatabaseNotFoundError
+from gimli.errors import exception_from_status
 
 
 def out(*args: Any, **kwds: Any) -> None:
@@ -72,7 +72,7 @@ def get_xml_path(filepath: str | None = None) -> tuple[str, UnitStatus]:
         status = UnitStatus.OPEN_ARG
 
     if not os.path.isfile(filepath):
-        raise DatabaseNotFoundError(filepath, status)
+        raise exception_from_status(status, repr(filepath))
 
     return filepath, status
 
