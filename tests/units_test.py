@@ -9,12 +9,13 @@ from hypothesis import given
 from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal
 
-import gimli
 from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._system import UnitSystem
 from gimli._utils import get_xml_path
-from gimli.errors import DatabaseNotFoundError
+from gimli.errors import UnitDatabaseError
+from gimli.errors import UnitOperationError
+from gimli.errors import UnitParseError
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +39,7 @@ def test_get_xml():
     assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ENV
 
-    with pytest.raises(DatabaseNotFoundError):
+    with pytest.raises(UnitDatabaseError):
         get_xml_path("/path/to/nowhere")
 
 
@@ -257,14 +258,14 @@ def test_unit_converter_same_units(system):
     [("not_a_unit", "m"), ("m", "not_a_unit"), ("not_a_unit", "not_a_unit")],
 )
 def test_unit_converter_bad_from_units(system, to_, from_):
-    with pytest.raises(gimli._udunits2.UdunitsError):
+    with pytest.raises(UnitParseError):
         system[from_].to(system[to_])
         # system.Unit(from_).to(system.Unit(to_))
 
 
 # @pytest.mark.skip()
 def test_unit_converter_incompatible_units(system):
-    with pytest.raises(gimli.errors.IncompatibleUnitsError):
+    with pytest.raises(UnitOperationError):
         system.Unit("s").to(system.Unit("m"))
 
 
