@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import contextlib
 import os
 import sys
-from collections.abc import Generator
 from typing import Any
 from xml.etree import ElementTree
 
@@ -22,25 +20,6 @@ def out(*args: Any, **kwds: Any) -> None:
 
 def err(*args: Any, **kwds: Any) -> None:
     print(*args, file=sys.stderr, **kwds)
-
-
-@contextlib.contextmanager
-def suppress_stdout() -> Generator[None]:
-    null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
-    # Save the actual stdout (1) and stderr (2) file descriptors.
-    save_fds = [os.dup(1), os.dup(2)]
-
-    os.dup2(null_fds[0], 1)
-    os.dup2(null_fds[1], 2)
-
-    yield
-
-    # Re-assign the real stdout/stderr back to (1) and (2)
-    os.dup2(save_fds[0], 1)
-    os.dup2(save_fds[1], 2)
-    # Close the null files
-    for fd in null_fds + save_fds:
-        os.close(fd)
 
 
 def get_xml_path(filepath: str | None = None) -> tuple[str, UnitStatus]:
