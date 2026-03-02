@@ -26,13 +26,15 @@ def test(session: nox.Session) -> None:
 @nox.session
 def coverage(session: nox.Session) -> None:
     """Run the tests and coverage."""
+    env = {"UDUNITS2_PREFIX": session.posargs[0]} if session.posargs else None
+
     session.install(
         *("-r", "requirements.in"),
         *("-r", "requirements-testing.in"),
     )
 
     _print_python_version(session)
-    session.install("-e", ".")
+    session.install("-e", ".", env=env)
     _coverage(session, tmpdir=False)
 
 
@@ -52,70 +54,80 @@ def build(session: nox.Session) -> None:
     session.run("python", "-m", "build", "--outdir", "./build/wheelhouse")
 
 
-@nox.session(name="build-extern", python=None)
-def build_extern(session: nox.Session) -> None:
-    _build_extern(session, session.posargs[0] if session.posargs else None)
+@nox.session(name="build-expat", python=None)
+def build_expat(session: nox.Session) -> None:
+    inst_dir = _build_expat(session, session.posargs[0] if session.posargs else None)
+    session.log(inst_dir)
 
 
-def _build_extern(session: nox.Session, inst_dir=None) -> str:
+@nox.session(name="build-udunits", python=None)
+def build_udunits(session: nox.Session) -> None:
+    inst_dir = _build_udunits(session, session.posargs[0] if session.posargs else None)
+    session.log(inst_dir)
+
+
+@nox.session(name="build-vendor", python=None)
+def build_vendor(session: nox.Session) -> None:
+    inst_dir = os.path.abspath(
+        session.posargs[0] if session.posargs else os.path.join(ROOT, "dist", "vendor")
+    )
+
+    _build_expat(session, inst_dir=inst_dir)
+    _build_udunits(session, inst_dir=inst_dir, expat_prefix=inst_dir)
+
+    session.log(inst_dir)
+
+
+def _build_expat(session: nox.Session, inst_dir=None) -> str:
     inst_dir = os.path.abspath(session.create_tmp() if inst_dir is None else inst_dir)
+    build_dir = os.path.join(session.create_tmp(), "expat")
 
-    build_dir = os.path.join(ROOT, "build", "extern")
+    src_dir = os.path.join(ROOT, "extern", "expat-2.6.0")
+
+    session.run(
+        "cmake",
+        *("-S", src_dir),
+        *("-B", build_dir),
+        f"-DCMAKE_INSTALL_PREFIX={inst_dir}",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        external=True,
+    )
+    session.run("cmake", "--build", build_dir, "--config", "Release", external=True)
+    session.run("cmake", "--install", build_dir, "--config", "Release", external=True)
+
+    return inst_dir
+
+
+def _build_udunits(session: nox.Session, inst_dir=None, expat_prefix=None) -> str:
+    inst_dir = os.path.abspath(session.create_tmp() if inst_dir is None else inst_dir)
+    build_dir = os.path.join(session.create_tmp(), "udunits")
+
+    extra_args = []
+    if expat_prefix is not None:
+        extra_args += [
+            f"-DEXPAT_INCLUDE_DIR={expat_prefix}/include",
+            f"-DEXPAT_LIBRARY={expat_prefix}/lib/libexpat.a",
+        ]
+
     src_dir = os.path.join(ROOT, "extern", "udunits-2.2.28")
 
-    os.makedirs(inst_dir, exist_ok=True)
-
-    os.makedirs(os.path.join(build_dir, "expat"), exist_ok=True)
-    with session.chdir(os.path.join(build_dir, "expat")):
-        session.run(
-            "cmake",
-            *("-S", os.path.join(ROOT, "extern", "expat-2.6.0/")),
-            *("-D", f"CMAKE_INSTALL_PREFIX={inst_dir}"),
-            external=True,
-        )
-        session.run(
-            "cmake",
-            *("--build", "."),
-            *("--config", "Release"),
-            external=True,
-        )
-        session.run(
-            "cmake",
-            *("--build", "."),
-            *("--config", "Release"),
-            *("--target", "install"),
-            external=True,
-        )
-
-    os.makedirs(os.path.join(build_dir, "udunits"), exist_ok=True)
-    with session.chdir(os.path.join(build_dir, "udunits")):
-        session.run(
-            "cmake",
-            *("-S", src_dir),
-            *("-D", f"CMAKE_INSTALL_PREFIX={inst_dir}"),
-            *("-D", f"EXPAT_LIBRARY={inst_dir}/lib/libexpat.dylib"),
-            env={
-                "LD_LIBRARY_PATH": f"{inst_dir}/lib",
-                "DYLD_LIBRARY_PATH": f"{inst_dir}/lib",
-                "LDFLAGS": f"-L{inst_dir}/lib",
-                "CFLAGS": f"-I{inst_dir}/include",
-            },
-            external=True,
-        )
-        session.run(
-            "cmake",
-            *("--build", "."),
-            *("--config", "Release"),
-            *("--target", "libudunits2"),
-            external=True,
-        )
-        session.run(
-            "cmake",
-            *("--build", "."),
-            *("--config", "Release"),
-            *("--target", "install"),
-            external=True,
-        )
+    session.run(
+        "cmake",
+        *("-S", src_dir),
+        *("-B", build_dir),
+        f"-DCMAKE_INSTALL_PREFIX={inst_dir}",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        *extra_args,
+        external=True,
+    )
+    session.run("cmake", "--build", build_dir, "--config", "Release", external=True)
+    session.run("cmake", "--install", build_dir, "--config", "Release", external=True)
 
     return inst_dir
 
@@ -294,13 +306,14 @@ def _install_from_path(session: nox.Session, path: str | None = None) -> None:
         session.error("path must be a source distribution or folder")
 
 
-def _install_editable(session: nox.Session, inst_dir=None) -> None:
-    if inst_dir is None:
-        inst_dir = _build_extern(session)
+def _install_editable(session: nox.Session, udunits_prefix=None) -> None:
+    if udunits_prefix is None:
+        udunits_prefix = _build_expat(session)
+        _build_udunits(session, inst_dir=udunits_prefix, expat_prefix=udunits_prefix)
 
-    session.install("-e", ".", env={"UDUNITS2_PREFIX": inst_dir})
+    session.install("-e", ".", env={"UDUNITS2_PREFIX": udunits_prefix})
 
-    return inst_dir
+    return udunits_prefix
 
 
 def _pytest_args():
