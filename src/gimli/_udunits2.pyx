@@ -23,7 +23,9 @@ from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._utils import get_xml_path
 from gimli._utils import suppress_stdout
-from gimli.errors import IncompatibleUnitsError
+from gimli.errors import GimliInternalError
+from gimli.errors import UnitOperationError
+from gimli.errors import status_to_error
 
 DOUBLE = np.double
 FLOAT = np.float32
@@ -101,8 +103,7 @@ cdef class _UnitSystem:
             self._unit_system = ut_read_xml(self._filepath)
 
         if self._unit_system == NULL:
-            status = ut_get_status()
-            raise UdunitsError(status)
+            raise status_to_error(ut_get_status() or UnitStatus.OS, filepath)
 
     def dimensionless_unit(self):
         """The dimensionless unit used by the unit system.
@@ -114,7 +115,7 @@ cdef class _UnitSystem:
         """
         cdef ut_unit* unit = ut_get_dimensionless_unit_one(self._unit_system)
         if unit == NULL:
-            raise UdunitsError(ut_get_status())
+            raise status_to_error(ut_get_status() or UnitStatus.NO_UNIT)
         return Unit.from_ptr(unit, owner=False)
 
     def unit_by_name(self, name):
@@ -137,7 +138,7 @@ cdef class _UnitSystem:
             if status == UnitStatus.SUCCESS:
                 return None
             else:
-                raise RuntimeError("system and/or name is NULL")
+                raise status_to_error(status or UnitStatus.NO_UNIT, repr(name))
         return Unit.from_ptr(unit, owner=True)
 
     def unit_by_symbol(self, symbol):
@@ -160,7 +161,7 @@ cdef class _UnitSystem:
             if status == UnitStatus.SUCCESS:
                 return None
             else:
-                raise RuntimeError("system and/or symbol is NULL")
+                raise status_to_error(status or UnitStatus.NO_UNIT, repr(symbol))
         return Unit.from_ptr(unit, owner=True)
 
     def Unit(self, name):
@@ -178,8 +179,7 @@ cdef class _UnitSystem:
         """
         unit = ut_parse(self._unit_system, name.encode("utf-8"), UnitEncoding.UTF8)
         if unit == NULL:
-            status = ut_get_status()
-            raise UdunitsError(status)
+            raise status_to_error(ut_get_status() or UnitStatus.PARSE, repr(name))
         if ut_is_dimensionless(unit):
             return Unit.from_ptr(unit, owner=False)
         else:
@@ -209,7 +209,7 @@ cdef class _UnitSystem:
         elif self._status == UnitStatus.OPEN_DEFAULT:
             return "default"
         else:
-            raise RuntimeError("unknown unit_system status")
+            raise GimliInternalError("unknown unit_system status")
 
     def __dealloc__(self):
         if self._unit_system != NULL:
@@ -229,7 +229,7 @@ cdef class Unit:
     @staticmethod
     cdef Unit from_ptr(ut_unit* unit_ptr, bint owner=False):
         if unit_ptr == NULL:
-            raise RuntimeError("unit pointer is NULL")
+            raise GimliInternalError("unit pointer is NULL")
 
         cdef Unit unit = Unit.__new__(Unit)
         unit._unit = unit_ptr
@@ -256,13 +256,15 @@ cdef class Unit:
 
     cpdef UnitConverter(self, Unit unit):
         if not ut_are_convertible(self._unit, unit._unit):
-            raise IncompatibleUnitsError(str(self), str(unit))
+            raise UnitOperationError(f"units are not convertable")
 
         with suppress_stdout():
             converter = ut_get_converter(self._unit, unit._unit)
 
         if converter == NULL:
-            raise UdunitsError(ut_get_status())
+            raise status_to_error(
+                ut_get_status() or UnitStatus.MEANINGLESS, "unable to create converter"
+            )
 
         return UnitConverter.from_ptr(converter, owner=True)
 
@@ -326,7 +328,7 @@ cdef class Unit:
             self._unit, self._buffer, 2048, opts=unit_encoding | formatting
         )
         if str_len >= 2048:
-            raise ValueError("unit string is too large")
+            raise GimliInternalError("unit string is too large")
 
         return self._buffer.decode(encoding=encoding)
 
@@ -345,7 +347,7 @@ cdef class Unit:
              if status == UnitStatus.SUCCESS:
                  return None
              else:
-                 raise UdunitsError(status)
+                 raise status_to_error(status or UnitStatus.NO_UNIT)
         else:
             return name.decode()
 
@@ -364,7 +366,7 @@ cdef class Unit:
              if status == UnitStatus.SUCCESS:
                  return None
              else:
-                 raise UdunitsError(status)
+                 raise status_to_error(status or UnitStatus.NO_UNIT)
         else:
             return symbol.decode()
 
@@ -385,8 +387,7 @@ cdef class Unit:
             if status == UnitStatus.SUCCESS:
                 return False
             else:
-                raise UdunitsError(status)
-
+                raise status_to_error(status or UnitStatus.MEANINGLESS)
 
     cpdef is_convertible_to(self, Unit unit):
         return bool(ut_are_convertible(self._unit, unit._unit))
