@@ -27,6 +27,7 @@
 - Added new api functions ``convert``, ``make_converter``, and ``get_unit_system``.
 - Added new *gimli* exceptions that map the *udunits* status codes.
 - Set the *udunits* error message handler to suppress error messages.
+- Changed the minimum supported version to Python 3.11.
 
 ## 0.3.3 (2024-10-04)
 
