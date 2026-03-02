@@ -89,3 +89,8 @@ def test_opt_to_from(tmpdir, values, capsys):
 def test_opt_to_from_incomaptible(tmpdir, capsys):
     with tmpdir.as_cwd(), contextlib.suppress(SystemExit):
         assert main(["--from=m", "--to=kg"]) != 0
+
+
+def test_bad_units():
+    with contextlib.suppress(SystemExit):
+        assert main(["--from=m", "--to=foobar"]) != 0
