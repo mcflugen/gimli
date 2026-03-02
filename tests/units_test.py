@@ -9,12 +9,14 @@ from hypothesis import given
 from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal
 
-import gimli
 from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._system import UnitSystem
 from gimli._utils import get_xml_path
-from gimli.errors import DatabaseNotFoundError
+from gimli.errors import UnitDatabaseError
+from gimli.errors import UnitNotFoundError
+from gimli.errors import UnitOperationError
+from gimli.errors import UnitParseError
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +40,7 @@ def test_get_xml():
     assert os.path.isfile(path)
     assert status == UnitStatus.OPEN_ENV
 
-    with pytest.raises(DatabaseNotFoundError):
+    with pytest.raises(UnitDatabaseError):
         get_xml_path("/path/to/nowhere")
 
 
@@ -89,17 +91,22 @@ def test_dimensionless_not_freed_twice():
 def test_system_unit_by_name(system):
     assert system.unit_by_name("meter") == system.Unit("m")
     assert system.unit_by_name("meters") == system.Unit("m")
-    assert system.unit_by_name("m") is None
-    assert system.unit_by_name("meter2") is None
-    assert system.unit_by_name("not_a_name") is None
+
+
+@pytest.mark.parametrize("name", ("m", "meter2", "not_a_name"))
+def test_system_unit_by_name_bad_name(system, name):
+    with pytest.raises(UnitNotFoundError):
+        system.unit_by_name(name)
 
 
 def test_system_unit_by_symbol(system):
     assert system.unit_by_symbol("m") == system.Unit("m")
-    assert system.unit_by_symbol("km") is None
-    assert system.unit_by_symbol("meter") is None
-    assert system.unit_by_symbol("m s-2") is None
-    assert system.unit_by_symbol("not_a_symbol") is None
+
+
+@pytest.mark.parametrize("symbol", ("km", "meter", "m s-1", "not_a_symbol"))
+def test_system_unit_by_symbol_bad_symbol(system, symbol):
+    with pytest.raises(UnitNotFoundError):
+        system.unit_by_symbol(symbol)
 
 
 def test_unit_formatting(system):
@@ -257,14 +264,14 @@ def test_unit_converter_same_units(system):
     [("not_a_unit", "m"), ("m", "not_a_unit"), ("not_a_unit", "not_a_unit")],
 )
 def test_unit_converter_bad_from_units(system, to_, from_):
-    with pytest.raises(gimli._udunits2.UdunitsError):
+    with pytest.raises(UnitParseError):
         system[from_].to(system[to_])
         # system.Unit(from_).to(system.Unit(to_))
 
 
 # @pytest.mark.skip()
 def test_unit_converter_incompatible_units(system):
-    with pytest.raises(gimli.errors.IncompatibleUnitsError):
+    with pytest.raises(UnitOperationError):
         system.Unit("s").to(system.Unit("m"))
 
 

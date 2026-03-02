@@ -23,7 +23,9 @@ from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._utils import get_xml_path
 from gimli._utils import suppress_stdout
-from gimli.errors import IncompatibleUnitsError
+from gimli.errors import GimliInternalError
+from gimli.errors import UnitOperationError
+from gimli.errors import exception_from_status
 
 DOUBLE = np.double
 FLOAT = np.float32
@@ -101,8 +103,7 @@ cdef class _UnitSystem:
             self._unit_system = ut_read_xml(self._filepath)
 
         if self._unit_system == NULL:
-            status = ut_get_status()
-            raise UdunitsError(status)
+            raise exception_from_status(ut_get_status(), filepath)
 
     def dimensionless_unit(self):
         """The dimensionless unit used by the unit system.
@@ -114,7 +115,7 @@ cdef class _UnitSystem:
         """
         cdef ut_unit* unit = ut_get_dimensionless_unit_one(self._unit_system)
         if unit == NULL:
-            raise UdunitsError(ut_get_status())
+            raise exception_from_status(ut_get_status())
         return Unit.from_ptr(unit, owner=False)
 
     def unit_by_name(self, name):
@@ -133,11 +134,7 @@ cdef class _UnitSystem:
         """
         unit = ut_get_unit_by_name(self._unit_system, name.encode("utf-8"))
         if unit == NULL:
-            status = ut_get_status()
-            if status == UnitStatus.SUCCESS:
-                return None
-            else:
-                raise RuntimeError("system and/or name is NULL")
+            raise exception_from_status(ut_get_status(), repr(name), fallback=UnitStatus.NO_UNIT)
         return Unit.from_ptr(unit, owner=True)
 
     def unit_by_symbol(self, symbol):
@@ -156,11 +153,7 @@ cdef class _UnitSystem:
         """
         unit = ut_get_unit_by_symbol(self._unit_system, symbol.encode("utf-8"))
         if unit == NULL:
-            status = ut_get_status()
-            if status == UnitStatus.SUCCESS:
-                return None
-            else:
-                raise RuntimeError("system and/or symbol is NULL")
+            raise exception_from_status(ut_get_status(), repr(symbol), fallback=UnitStatus.NO_UNIT)
         return Unit.from_ptr(unit, owner=True)
 
     def Unit(self, name):
@@ -178,8 +171,7 @@ cdef class _UnitSystem:
         """
         unit = ut_parse(self._unit_system, name.encode("utf-8"), UnitEncoding.UTF8)
         if unit == NULL:
-            status = ut_get_status()
-            raise UdunitsError(status)
+            raise exception_from_status(ut_get_status(), repr(name))
         if ut_is_dimensionless(unit):
             return Unit.from_ptr(unit, owner=False)
         else:
@@ -209,7 +201,7 @@ cdef class _UnitSystem:
         elif self._status == UnitStatus.OPEN_DEFAULT:
             return "default"
         else:
-            raise RuntimeError("unknown unit_system status")
+            raise GimliInternalError("unknown unit_system status")
 
     def __dealloc__(self):
         if self._unit_system != NULL:
@@ -229,7 +221,7 @@ cdef class Unit:
     @staticmethod
     cdef Unit from_ptr(ut_unit* unit_ptr, bint owner=False):
         if unit_ptr == NULL:
-            raise RuntimeError("unit pointer is NULL")
+            raise GimliInternalError("unit pointer is NULL")
 
         cdef Unit unit = Unit.__new__(Unit)
         unit._unit = unit_ptr
@@ -256,13 +248,13 @@ cdef class Unit:
 
     cpdef UnitConverter(self, Unit unit):
         if not ut_are_convertible(self._unit, unit._unit):
-            raise IncompatibleUnitsError(str(self), str(unit))
+            raise UnitOperationError(f"units are not convertable")
 
         with suppress_stdout():
             converter = ut_get_converter(self._unit, unit._unit)
 
         if converter == NULL:
-            raise UdunitsError(ut_get_status())
+            raise exception_from_status(ut_get_status(), "unable to create converter")
 
         return UnitConverter.from_ptr(converter, owner=True)
 
@@ -326,7 +318,7 @@ cdef class Unit:
             self._unit, self._buffer, 2048, opts=unit_encoding | formatting
         )
         if str_len >= 2048:
-            raise ValueError("unit string is too large")
+            raise GimliInternalError("unit string is too large")
 
         return self._buffer.decode(encoding=encoding)
 
@@ -340,14 +332,7 @@ cdef class Unit:
             Name of the unit as a string or, ``None`` if no mapping exists.
         """
         name = ut_get_name(self._unit, 0)
-        if name == NULL:
-             status = ut_get_status()
-             if status == UnitStatus.SUCCESS:
-                 return None
-             else:
-                 raise UdunitsError(status)
-        else:
-            return name.decode()
+        return None if name == NULL else name.decode()
 
     @property
     def symbol(self):
@@ -359,14 +344,7 @@ cdef class Unit:
             Symbol of the unit as a string or, ``None`` if no mapping exists.
         """
         symbol = ut_get_symbol(self._unit, 0)
-        if symbol == NULL:
-             status = ut_get_status()
-             if status == UnitStatus.SUCCESS:
-                 return None
-             else:
-                 raise UdunitsError(status)
-        else:
-            return symbol.decode()
+        return None if symbol == NULL else symbol.decode()
 
     @property
     def is_dimensionless(self):
@@ -378,15 +356,14 @@ cdef class Unit:
             ``True`` if the unit is dimensionless, otherwise ``False``.
         """
         rtn = ut_is_dimensionless(self._unit)
+
         if rtn != 0:
             return True
         else:
             status = ut_get_status()
             if status == UnitStatus.SUCCESS:
                 return False
-            else:
-                raise UdunitsError(status)
-
+            raise exception_from_status(status)
 
     cpdef is_convertible_to(self, Unit unit):
         return bool(ut_are_convertible(self._unit, unit._unit))

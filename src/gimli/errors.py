@@ -4,45 +4,82 @@ from gimli._constants import STATUS_MESSAGE
 from gimli._constants import UnitStatus
 
 
+def exception_from_status(
+    status: UnitStatus,
+    message: str | None = None,
+    *,
+    fallback: UnitStatus | None = None,
+) -> GimliError:
+    if status == UnitStatus.SUCCESS:
+        if fallback is None:
+            raise GimliInternalError("status is success but no fallback given")
+        status = fallback
+
+    exc_type = _STATUS_TO_ERROR.get(status)
+    if exc_type is None:
+        raise GimliInternalError(f"unknown udunits status ({status!r})")
+
+    if message is None:
+        return exc_type(STATUS_MESSAGE[status])
+    else:
+        return exc_type(message)
+
+
 class GimliError(Exception):
-    pass
+    """Base class for all gimli errors."""
 
 
-class IncompatibleUnitsError(GimliError):
-    def __init__(self, src: str, dst: str):
-        self._src = src
-        self._dst = dst
-
-    def __str__(self) -> str:
-        return f"incompatible units ({self._src!r}, {self._dst!r})"
+class GimliInternalError(GimliError):
+    """Internal invariant/contract violation (likely a gimli bug)."""
 
 
-class UnitError(GimliError):
-    def __init__(self, code: UnitStatus, msg: str | None = None):
-        self._code = code
-        self._msg = msg or STATUS_MESSAGE.get(self._code, "Unknown")
-
-    def __str__(self) -> str:
-        return f"{self._msg} (status {self._code})"
+class UnitDatabaseError(GimliError):
+    """Failure opening/reading/parsing the unit database."""
 
 
-class UnitNameError(UnitError):
-    def __init__(self, name: str, code: UnitStatus):
-        self._name = name
-        self._code = code
-        self._msg = STATUS_MESSAGE.get(self._code, "Unknown")
-
-    def __str__(self) -> str:
-        return f"{self._name!r}: {self._msg} (status {self._code})"
+class DatabaseNotFoundError(UnitDatabaseError):
+    """Deprecated. Use UnitDatabaseError instead."""
 
 
-class DatabaseNotFoundError(GimliError):
-    def __init__(self, path: str, status: int):
-        self._path = str(path)
-        self._status = status
+class UnitSystemError(GimliError):
+    """Unit system is inconsistent or incompatible."""
 
-    def __str__(self) -> str:
-        return (
-            f"{self._path}: unable to locate units database"
-            f" ({self._status}): path does not exist"
-        )
+
+class UnitNotFoundError(GimliError, LookupError):
+    """Requested unit/prefix/identifier does not exist."""
+
+
+class UnitParseError(GimliError, ValueError):
+    """Unit string cannot be parsed."""
+
+
+class UnitNameError(UnitParseError):
+    """Deprecated. Use UnitParseError instead."""
+
+
+class UnitOperationError(GimliError, ValueError):
+    """Unit operation is invalid/meaningless (or formatting not possible)."""
+
+
+class IncompatibleUnitsError(UnitOperationError):
+    """Deprecated. Use UnitOperationError instead."""
+
+
+_STATUS_TO_ERROR: dict[UnitStatus, type[GimliError] | None] = {
+    UnitStatus.SUCCESS: None,
+    UnitStatus.BAD_ARG: GimliInternalError,
+    UnitStatus.EXISTS: UnitSystemError,
+    UnitStatus.NO_UNIT: UnitNotFoundError,
+    UnitStatus.OS: UnitDatabaseError,
+    UnitStatus.NOT_SAME_SYSTEM: UnitSystemError,
+    UnitStatus.MEANINGLESS: UnitOperationError,
+    UnitStatus.NO_SECOND: UnitSystemError,
+    UnitStatus.VISIT_ERROR: GimliInternalError,
+    UnitStatus.CANT_FORMAT: UnitOperationError,
+    UnitStatus.SYNTAX: UnitParseError,
+    UnitStatus.UNKNOWN: UnitParseError,
+    UnitStatus.OPEN_ARG: UnitDatabaseError,
+    UnitStatus.OPEN_ENV: UnitDatabaseError,
+    UnitStatus.OPEN_DEFAULT: UnitDatabaseError,
+    UnitStatus.PARSE: UnitParseError,
+}
