@@ -11,8 +11,8 @@ from gimli._udunits2 import UdunitsError
 from gimli._utils import err
 from gimli._utils import out
 from gimli._version import __version__
-from gimli.errors import IncompatibleUnitsError
-from gimli.errors import UnitNameError
+from gimli.errors import UnitOperationError
+from gimli.errors import UnitParseError
 
 system = UnitSystem()
 
@@ -55,7 +55,7 @@ def main(argv: tuple[str, ...] | None = None) -> int:
 
     try:
         src_to_dst = args.from_.to(args.to)
-    except IncompatibleUnitsError:
+    except UnitOperationError:
         err(f"[error] incompatible units: {args.from_!s}, {args.to!s}")
         return 1
     except UdunitsError as error:
@@ -96,7 +96,7 @@ class UnitType(argparse.Action):
 
         try:
             units = system.Unit(values)
-        except UnitNameError:
+        except UnitParseError:
             parser.error(f"[error] unknown or poorly-formed unit: {values!r}")
         else:
             setattr(namespace, self.dest, units)
