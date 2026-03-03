@@ -28,6 +28,8 @@
 - Added new *gimli* exceptions that map the *udunits* status codes.
 - Set the *udunits* error message handler to suppress error messages.
 - Changed the minimum supported version to Python 3.11.
+- Added a new class, `UnitConverter`, that replaces `make_converter` and fixes an issue
+  it had with non-affine transformations.
 
 ## 0.3.3 (2024-10-04)
 
