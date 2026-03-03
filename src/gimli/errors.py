@@ -19,10 +19,13 @@ def exception_from_status(
     if exc_type is None:
         raise GimliInternalError(f"unknown udunits status ({status!r})")
 
+    desc = STATUS_MESSAGE[status]
     if message is None:
-        return exc_type(STATUS_MESSAGE[status])
+        return exc_type(f"UDUNITS-2 error: {desc}")
     else:
-        return exc_type(message)
+        exc = exc_type(message)
+        exc.add_note(f"UDUNITS-2 status: {status} - {desc}")
+        return exc
 
 
 class GimliError(Exception):
