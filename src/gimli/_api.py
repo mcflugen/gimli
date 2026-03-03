@@ -12,7 +12,7 @@ from gimli._utils import get_xml_path
 _UNIT_SYSTEM_CACHE: dict[str, UnitSystem] = {}
 
 
-def make_converter(src: str, dst: str, system: UnitSystem | None = None) -> Converter:
+class UnitConverter:
     """Create a callable converter between two units.
 
     Parameters
@@ -27,28 +27,67 @@ def make_converter(src: str, dst: str, system: UnitSystem | None = None) -> Conv
 
     Returns
     -------
-    converter: Converter
+    converter: UnitConverter
         A callable object that converts values from *src* to *dst*.
 
     Examples
     --------
-    >>> c = make_converter("degC", "K")
-    >>> c(0.0)
+    >>> convert = UnitConverter("degC", "K")
+    >>> convert(0.0)
     273.15
+
+    >>> convert = UnitConverter("miles / hr", "km / hour")
+    >>> convert(55)
+    88.51392
     """
-    if system is None:
-        _system = get_unit_system()
-    else:
-        _system = system
 
-    src_units = _system.Unit(src)
-    dst_units = _system.Unit(dst)
-    src_to_dst = src_units.to(dst_units)
+    def __init__(self, src: str, dst: str, system: UnitSystem | None = None) -> None:
+        self._system = get_unit_system() if system is None else system
 
-    offset = src_to_dst(0.0)
-    scale = src_to_dst(1.0) - offset
+        self._src_to_dst = self._system.Unit(src).to(self._system.Unit(dst))
 
-    return Converter(src, dst, scale=scale, offset=offset)
+        self._src = src
+        self._dst = dst
+
+    @property
+    def source(self) -> str:
+        return self._src
+
+    @property
+    def destination(self) -> str:
+        return self._dst
+
+    def __call__(self, values: ArrayLike) -> float | NDArray[np.floating]:
+        if np.isscalar(values):
+            return self._src_to_dst(values)
+        return self._src_to_dst(np.asarray(values))
+
+    def __repr__(self) -> str:
+        args = [repr(self.source), repr(self.destination)]
+        if self._system != get_unit_system():
+            args += [f"system=UnitSystem({self._system.database!r})"]
+        return f"UnitConverter({', '.join(args)})"
+
+    def inverse(self) -> UnitConverter:
+        """Create a converter that goes in the opposite direction.
+
+        Examples
+        --------
+        >>> a = UnitConverter("min / mile", "s / (400 m)")
+        >>> int(a(4.0))
+        59
+
+        >>> a = UnitConverter("mile", "m")
+        >>> a(4.0)
+        6437.376
+        >>> a.inverse()
+        UnitConverter('m', 'mile')
+
+        >>> b = a.inverse()
+        >>> b(a(4.0))
+        4.0
+        """
+        return UnitConverter(self.destination, self.source, system=self._system)
 
 
 def convert(
@@ -89,7 +128,7 @@ def convert(
     >>> convert([0.0, 1000.0], "m", "km")
     array([0., 1.])
     """
-    converter = make_converter(from_, to, system=system)
+    converter = UnitConverter(from_, to, system=system)
     return converter(values)
 
 
@@ -129,42 +168,6 @@ def get_unit_system(filepath: str | None = None) -> UnitSystem:
     if canonical_path not in _UNIT_SYSTEM_CACHE:
         _UNIT_SYSTEM_CACHE[canonical_path] = UnitSystem(canonical_path)
     return _UNIT_SYSTEM_CACHE[canonical_path]
-
-
-class Converter:
-    """Convert units."""
-
-    __slots__ = ("source", "destination", "scale", "offset")
-
-    def __init__(
-        self,
-        src: str,
-        dst: str,
-        *,
-        scale: float,
-        offset: float,
-    ) -> None:
-        self.source = src
-        self.destination = dst
-        self.scale = float(scale)
-        self.offset = float(offset)
-
-    def __call__(self, values: ArrayLike) -> float | NDArray:
-        """Convert values from source to destination units."""
-        if np.isscalar(values):
-            return self.scale * float(values) + self.offset
-
-        arr = np.asarray(values)
-        return arr * self.scale + self.offset
-
-    def __repr__(self) -> str:
-        args = (
-            repr(self.source),
-            repr(self.destination),
-            f"scale={self.scale!r}",
-            f"offset={self.offset!r}",
-        )
-        return f"Converter({', '.join(args)})"
 
 
 def _canonicalize_path(path: str) -> str:
