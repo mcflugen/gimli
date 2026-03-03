@@ -90,7 +90,7 @@ class UnitConverter:
         return UnitConverter(self.destination, self.source, system=self._system)
 
 
-def convert(
+def convert_units(
     values: ArrayLike, from_: str, to: str, system: UnitSystem | None = None
 ) -> float | NDArray[np.floating]:
     """Convert values from one unit to another.
@@ -120,12 +120,12 @@ def convert(
     --------
     Convert a scalar:
 
-    >>> convert(10.0, "m", "ft")
+    >>> convert_units(10.0, "m", "ft")
     32.80839895013123
 
     Convert an array:
 
-    >>> convert([0.0, 1000.0], "m", "km")
+    >>> convert_units([0.0, 1000.0], "m", "km")
     array([0., 1.])
     """
     converter = UnitConverter(from_, to, system=system)

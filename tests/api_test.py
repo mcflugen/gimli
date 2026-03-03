@@ -2,7 +2,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 
 from gimli._api import UnitConverter
-from gimli._api import convert
+from gimli._api import convert_units
 from gimli._api import get_unit_system
 from gimli._system import UnitSystem
 
@@ -34,9 +34,9 @@ def _setup_fake_database(path):
     return str(path / "udunits2-fake.xml")
 
 
-def test_convert():
+def test_convert_units():
     expected = 0.01
-    actual = convert(10.0, "m", "km")
+    actual = convert_units(10.0, "m", "km")
     assert actual == pytest.approx(expected)
 
 
@@ -53,7 +53,9 @@ def test_convert_repr(unit_a, unit_b):
 
 @pytest.mark.parametrize("value", (53.0, 0.0, -1.0, [4, 6]))
 def test_convert_round_trip(value):
-    assert convert(convert(value, "km", "m"), "m", "km") == pytest.approx(value)
+    assert convert_units(convert_units(value, "km", "m"), "m", "km") == pytest.approx(
+        value
+    )
 
 
 def test_converter():
