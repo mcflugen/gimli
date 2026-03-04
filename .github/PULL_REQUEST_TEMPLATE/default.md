@@ -9,4 +9,4 @@
 
 - [ ] Docstrings/docs updated
 - [ ] Changelog entry added
-- [ ] Commit history is clean and logically organized
+- [ ] Commit history cleaned up (no WIP/fixup commits)

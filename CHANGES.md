@@ -31,6 +31,7 @@
 - Added a new class, `UnitConverter`, that replaces `make_converter` and fixes an issue
   it had with non-affine transformations.
 - Renamed the `gimli.convert` function to `gimli.convert_units`.
+- Added a CONTRIBUTING doc and pull request templates.
 
 ## 0.3.3 (2024-10-04)
 
