@@ -1,6 +1,6 @@
 # Checklist
 
-- [ ] Update version `src/gimli/_version.py`.
+- [ ] Update version `pyproject.toml`
 - [ ] Update version in the `CHANGES.md`.
 - [ ] Proofread and edit `CHANGES.md`.
 - [ ] Test publish to *testpypi* and install from *testpypi*.
