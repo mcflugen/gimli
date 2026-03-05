@@ -1,39 +1,49 @@
 # Changelog for gimli
 
-## 0.3.4 (unreleased)
+## 0.4.0
 
-- Fixed cibuildwheel builds for *macos* *x86_64*.
-- Fixed failing tests by using *coverage* directly instead of *pytest-cov*.
-  This fixed tests that failed with double import of *numpy* errors.
-- Added tests for Python 3.10, 3.11, 3.12, 3.13, and 3.14 on the latest versions
-  of *Linux*, *Mac*, and *Windows*.
-- Added `nogil` blocks to the unit converters for speed imrovements for large
-  arrays.
-- Added `NULL` checks to prevent possible segmentation faults.
+### Features
+
+- Added new API functions: `convert`, `make_converter`, and `get_unit_system`.
+- Added a new `UnitConverter` class that replaces `make_converter` and fixes an
+  issue with non-affine transformations.
 - Implemented `__hash__` for `Units`.
-- Fixed a bug in the error string for a bad encoding value in the unit formatter.
-- Changed error to `IncompatibleUnitsError` when trying to convert between
-  units that are not compatible with one another.
-- Implemented `__richcmp__` in *cython* for for unit comparisons with `Units`.
+- Implemented `__richcmp__` in *Cython* to support rich comparisons for `Units`.
+- Added `nogil` blocks to the unit converters for improved performance when
+  converting large arrays.
+- Added new *gimli* exceptions that map *UDUNITS* status codes.
+- Added tests for Python 3.10, 3.11, 3.12, 3.13, and 3.14 on the latest versions
+  of *Linux*, *macOS*, and *Windows*.
+
+### Changes
+
+- Renamed `gimli.convert` to `gimli.convert_units`.
+- Changed the error raised when converting between incompatible units to
+  `IncompatibleUnitsError`.
+- Set the *UDUNITS* error message handler to suppress error messages.
+- Increased the minimum supported Python version to 3.11.
+
+### Fixes
+
+- Fixed `cibuildwheel` builds for *macOS* `x86_64`.
+- Fixed failing tests caused by double-import *NumPy* errors by running
+  *coverage* directly instead of *pytest-cov*.
+- Fixed an issue that caused all CI tests to run under the same Python version.
+- Fixed a bug in the unit formatter error string for invalid encoding values.
+- Added `NULL` checks to prevent possible segmentation faults.
+
+### Maintenance
+
 - Added a *coverage* session to the *nox* file that runs coverage on an editable
   install rather than on a wheel.
-- Replaced *coveralls* with *Codecov* in the CI.
-- Fixed an issue that caused all of the CI tests to run with the same python
-  version.
-- Changed the CI to publish to PyPI/TestPyPI when the workflow is manually
-  triggered rather than looking for a tag.
-- Link to static libraries when building wheels.
-- Removed deprecated ``FileType`` *argparse* types from the *cli*.
-- Added new api functions ``convert``, ``make_converter``, and ``get_unit_system``.
-- Added new *gimli* exceptions that map the *udunits* status codes.
-- Set the *udunits* error message handler to suppress error messages.
-- Changed the minimum supported version to Python 3.11.
-- Added a new class, `UnitConverter`, that replaces `make_converter` and fixes an issue
-  it had with non-affine transformations.
-- Renamed the `gimli.convert` function to `gimli.convert_units`.
-- Added a CONTRIBUTING doc and pull request templates.
-- Added the canonical *gimli* version to `pyproject.toml` and use `importlib.metadata`
-  in `_version.py` to set the version.
+- Replaced *Coveralls* with *Codecov* in CI.
+- Updated CI to publish to PyPI/TestPyPI when the workflow is manually
+  triggered instead of detecting tags.
+- Linked against static libraries when building wheels.
+- Removed deprecated `argparse.FileType` usage from the CLI.
+- Added a `CONTRIBUTING` document and pull request templates.
+- Added the canonical *gimli* version to `pyproject.toml` and use
+  `importlib.metadata` in `_version.py` to determine the package version.
 
 ## 0.3.3 (2024-10-04)
 
