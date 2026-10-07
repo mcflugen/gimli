@@ -1,6 +1,13 @@
 # Changelog for gimli
 
-## 0.4.0
+
+## 0.4.1 (unreleased)
+
+### Features
+
+- Added support for Python 3.15.
+
+## 0.4.0 (2026-03-04)
 
 ### Features
 
