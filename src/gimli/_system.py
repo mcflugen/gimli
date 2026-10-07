@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from gimli._udunits2 import Unit
 from gimli._udunits2 import _UnitSystem
 from gimli._utils import load_database
+from gimli.errors import UnitParseError
 
 
 class UnitSystem(Mapping[str, Unit], _UnitSystem):
@@ -50,6 +51,17 @@ class UnitSystem(Mapping[str, Unit], _UnitSystem):
             return self.data[name]
         else:
             return self.data[key]
+
+    def __contains__(self, key: object) -> bool:
+        """Return whether *key* is a valid unit expression in this system."""
+        if not isinstance(key, str):
+            return False
+
+        try:
+            self[key]
+        except UnitParseError:
+            return False
+        return True
 
     def __iter__(self) -> Generator[str]:
         yield from self.data
