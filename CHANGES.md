@@ -7,6 +7,10 @@
 
 - Added support for Python 3.15.
 
+### Fixes
+
+- Fixed unit-system membership checks to return `False` for invalid units.
+
 ## 0.4.0 (2026-03-04)
 
 ### Features

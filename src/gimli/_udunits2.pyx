@@ -176,7 +176,9 @@ cdef class _UnitSystem:
         """
         unit = ut_parse(self._unit_system, name.encode("utf-8"), UnitEncoding.UTF8)
         if unit == NULL:
-            raise exception_from_status(ut_get_status(), repr(name))
+            raise exception_from_status(
+                ut_get_status(), repr(name), fallback=UnitStatus.SYNTAX
+            )
         if ut_is_dimensionless(unit):
             return Unit.from_ptr(unit, owner=False)
         else:

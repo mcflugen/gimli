@@ -1,6 +1,7 @@
 import operator
 import os
 import random
+from unittest.mock import patch
 
 import hypothesis.extra.numpy as hynp
 import numpy as np
@@ -13,6 +14,7 @@ from gimli._constants import UnitFormatting
 from gimli._constants import UnitStatus
 from gimli._system import UnitSystem
 from gimli._utils import get_xml_path
+from gimli.errors import GimliInternalError
 from gimli.errors import UnitDatabaseError
 from gimli.errors import UnitNotFoundError
 from gimli.errors import UnitOperationError
@@ -49,6 +51,36 @@ def test_default_system():
     system = UnitSystem()
     assert system.status == "default"
     assert os.path.isfile(system.database)
+
+
+@pytest.mark.parametrize("name", ("m", "meter", "meters", " km ", "m/s", "1"))
+def test_system_contains(name):
+    system = UnitSystem()
+    assert name in system
+
+
+@pytest.mark.parametrize("name", ("foo", "not_a_unit", "m/(", "m//s"))
+def test_system_contains_invalid_unit(system, name):
+    assert name not in system
+    with pytest.raises(UnitParseError):
+        system[name]
+
+
+@pytest.mark.parametrize("key", (None, 1, ["m"], {"unit": "m"}, b"m"))
+def test_system_contains_non_string(system, key):
+    assert key not in system
+
+
+def test_system_contains_propagates_internal_error(system):
+    with (
+        patch.object(
+            UnitSystem,
+            "__getitem__",
+            side_effect=GimliInternalError("unexpected failure"),
+        ),
+        pytest.raises(GimliInternalError, match="unexpected failure"),
+    ):
+        _ = "m" in system
 
 
 def test_user_system():
